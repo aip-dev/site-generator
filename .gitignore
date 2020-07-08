@@ -1,0 +1,3 @@
+# Python tools
+.mypy_cache
+htmlcov
