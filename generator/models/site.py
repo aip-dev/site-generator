@@ -149,13 +149,10 @@ class Site:
             with io.open(config_file, 'r') as f:
                 config = yaml.safe_load(f.read())
 
-        # Get the page code.
-        code = md_file.split(os.path.sep)[-1].split('.')[0].lower()
-
         # Return the page.
         return Page(
-            code=code,
             config=config,
             content=md.MarkdownDocument(content),
+            repo_path=md_file[len(self.base_dir):],
             site=self,
         )

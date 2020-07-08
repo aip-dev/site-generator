@@ -22,20 +22,18 @@ from generator.env import jinja_env
 
 @dataclasses.dataclass(frozen=True)
 class Page:
-    code: str
     content: md.MarkdownDocument
+    repo_path: str
     site: Site
     config: typing.Dict[str, typing.Any]
 
     @property
-    def relative_uri(self) -> str:
-        return f'/{self.code}'
+    def code(self) -> str:
+        return self.repo_path.split('/')[-1].split('.')[0].lower()
 
     @property
-    def repo_path(self) -> str:
-        if self.code == 'contributing':
-            return '/CONTRIBUTING.md'
-        return f'/site/pages/{self.code}.md'
+    def relative_uri(self) -> str:
+        return f'/{self.code}'
 
     @property
     def title(self) -> str:

@@ -12,45 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# from unittest import mock
-# import io
-
-# import pytest
-
-# from generator import models
+from generator.models.aip import AIP
 
 
-# def test_load():
-#     config = mocks.file("""
-#         ---
-#         title: My Scope
-#         order: 85
-#     """)
-#     with mock.patch.object(io, 'open', config) as o:
-#         scope = models.Scope.load('my-scope')
-#         o.assert_called_once_with('my-scope/meta.yaml', 'r')
-#     assert scope.code == 'my-scope'
-#     assert scope.title == 'My Scope'
-#     assert scope.order == 85
+def test_aips(site):
+    general = site.scopes['general']
+    poetry = site.scopes['poetry']
+    assert all([i.id < 1000 for i in general.aips.values()])
+    assert all([i.id > 1000 for i in poetry.aips.values()])
+    assert all([isinstance(i, AIP) for i in general.aips.values()])
 
 
-# @pytest.fixture
-# def scope():
-#     return models.Scope(
-#         directory='general',
-#         code='general',
-#         title='General',
-#         order=0,
-#         data={},
-#     )
+def test_categories(site):
+    general = site.scopes['general']
+    poetry = site.scopes['poetry']
+    assert len(general.categories) == 2
+    assert 'hugo' in general.categories
+    assert 'dickens' in general.categories
+    assert len(poetry.categories) == 1
+    assert 'poetry' in poetry.categories
 
 
-# def test_relative_uri(scope):
-#     assert scope.relative_uri == '/general'
+def test_relative_uri(site):
+    for scope in site.scopes.values():
+        assert scope.relative_uri == f'/{scope.code}'
 
 
-# def test_render(scope):
-#     with mock.patch.object(models, 'Site', mocks.Site):
-#         scope._aips = {}
-#         rendered = scope.render()
-#     assert '<title>General AIPs</title>' in rendered
+def test_render(site):
+    rendered = site.scopes['general'].render()
+    assert '<h3>Victor Hugo</h3>' in rendered
+    assert '<h3>Dickens</h3>' in rendered
+    assert '<h3>Shakespearean Poetry</h3>' in site.scopes['poetry'].render()

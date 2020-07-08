@@ -15,10 +15,7 @@
 from __future__ import annotations
 import dataclasses
 import datetime
-import io
 import typing
-
-import yaml
 
 from generator import md
 from generator.env import jinja_env
@@ -48,7 +45,9 @@ class AIP:
     @property
     def placement(self) -> Placement:
         """Return the placement data for this AIP, or sensible defaults."""
-        return Placement(**self.config.get('placement', {}))
+        p = self.config.get('placement', {})
+        p.setdefault('category', self.scope.code)
+        return Placement(**p)
 
     @property
     def redirects(self) -> typing.Set[str]:
@@ -112,7 +111,7 @@ class Change:
 
 @dataclasses.dataclass(frozen=True)
 class Placement:
-    category: str = 'misc'
+    category: str
     order: typing.Union[int, float] = float('inf')
 
 

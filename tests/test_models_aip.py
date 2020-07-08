@@ -31,7 +31,7 @@ def test_placement(site):
     assert christmas.placement.category == 'dickens'
     assert christmas.placement.order == 10
     sonnet = site.aips[1609]
-    assert sonnet.placement.category == 'misc'
+    assert sonnet.placement.category == 'poetry'
     assert sonnet.placement.order == float('inf')
 
 
