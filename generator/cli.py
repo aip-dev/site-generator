@@ -34,7 +34,7 @@ from generator.publisher import Publisher
     writable=True))
 def publish(src: str, dest: str):
     """Publish static HTML pages into the specified location."""
-    publisher = Publisher(src, dest, log_to_stdout=True)
+    publisher = Publisher(src, dest)
     publisher.publish_site()
 
 

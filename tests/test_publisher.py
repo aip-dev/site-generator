@@ -19,5 +19,5 @@ from generator.publisher import Publisher
 
 def test_publisher():
     with tempfile.TemporaryDirectory() as tmp:
-        pub = Publisher('tests/test_data/', tmp, log_to_stdout=False)
+        pub = Publisher('tests/test_data/', tmp)
         pub.publish_site()

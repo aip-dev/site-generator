@@ -17,10 +17,10 @@ import io
 import os
 import re
 import shutil
-import sys
 import typing
 
 from scss.compiler import compile_file  # type: ignore
+import click
 
 from generator import env
 from generator.models.aip import AIP
@@ -37,16 +37,13 @@ GENERATOR_ROOT = os.path.realpath(
 class Publisher:
     """Class for writing the AIP site out to disk."""
 
-    def __init__(self, src, dest, *, log_to_stdout=False):
+    def __init__(self, src, dest):
         self.output_dir = dest.rstrip(os.path.sep)
-        self.log_to_stdout = log_to_stdout
         self.site = Site.load(src.rstrip(os.path.sep))
 
     def log(self, message: str, *, err: bool = False):
         """Conditionally log a message."""
-        dest = sys.stderr if err else sys.stdout
-        if self.log_to_stdout:
-            print(f'{message}', file=dest)
+        click.secho(f'{message}', nl=True, err=err)
 
     def publish_site(self):
         """Publish the full site."""
