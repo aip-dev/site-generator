@@ -1,0 +1,25 @@
+[run]
+branch = True
+omit =
+  # Testing the development server is both difficult and unnecessary.
+  generator/server.py
+
+[report]
+fail_under = 100
+show_missing = True
+exclude_lines =
+    # Re-enable the standard pragma
+    pragma: NO COVER
+
+    # Enable an English version.
+    Impossible; skip coverage checks.
+
+    # Ignore debug-only repr
+    def __repr__
+
+    # Abstract methods by definition are not invoked
+    @abstractmethod
+    @abc.abstractmethod
+
+    # Type checking code will never be reached.
+    if typing.TYPE_CHECKING:

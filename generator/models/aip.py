@@ -93,13 +93,6 @@ class AIP:
             site=self.site,
         )
 
-    def _injest_changelog(self, filename: str):
-        """Injest a fragment of an AIP changelog into the object."""
-        with io.open(filename, 'r') as f:
-            conf = yaml.safe_load(f)
-        for cl in conf.get('changelog', ()):
-            self.changelog.add(Change(**cl))
-
 
 @dataclasses.dataclass(frozen=True)
 class Change:

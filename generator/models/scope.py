@@ -23,6 +23,7 @@ import yaml
 
 from generator.env import jinja_env
 from generator.models.aip import AIP
+from generator.models.aip import Change
 from generator.utils import cached_property
 
 
@@ -63,6 +64,7 @@ class Scope:
                 id=meta.pop('id'),
                 body=body,
                 config=meta,
+                changelog={Change(**i) for i in meta.pop('changelog', [])},
                 created=meta.pop('created'),
                 repo_path=aip_file[len(self.site.base_dir):],
                 scope=self,

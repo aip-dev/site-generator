@@ -12,18 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import date
+import os
 
-from generator.models import Change
+import pytest
 
-
-def test_ordering():
-    a = Change(date=date(2012, 4, 21), message='foo')
-    b = Change(date=date(2020, 4, 21), message='bar')
-    assert a > b
+from generator.models.site import Site
 
 
-def test_set():
-    a = Change(date=date(2012, 4, 21), message='foo')
-    b = Change(date=date(2020, 4, 21), message='bar')
-    assert len({a, a, b, b}) == 2
+@pytest.fixture
+def site():
+    root = os.path.realpath(f'{os.path.dirname(__file__)}/test_data')
+    return Site.load(root)

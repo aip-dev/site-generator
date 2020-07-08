@@ -13,109 +13,61 @@
 # limitations under the License.
 
 from datetime import date
-from unittest import mock
-import dataclasses
-import io
-import textwrap
 
-import pytest
-
-from generator import models
-from tests import mocks
+from generator.models.aip import Change
 
 
-def test_load():
-    aip_file = mock.mock_open(read_data=textwrap.dedent("""
-        ---
-        aip:
-            id: 42
-            state: reviewing
-            created: 2012-04-21
-        ---
-        # The Answer
-
-        To life, the universe, and everything.
-    """).strip())
-    with mock.patch.object(io, 'open', aip_file) as m:
-        aip = models.AIP.load_legacy('general', 42)
-        m.assert_called_once_with(f'{models.AIP_DIR}/general/0042.md', 'r')
-    assert aip.id == 42
-    assert aip.state == 'reviewing'
-    assert aip.created == date(2012, 4, 21)
-    assert aip.title == 'The Answer'
+def test_content(site):
+    christmas = site.aips[43]
+    assert 'Marley was dead' in christmas.content
+    assert '## Changelog' in christmas.content
+    tale = site.aips[59]
+    assert 'It was the best of times' in tale.content
+    assert 'Changelog' not in tale.content
 
 
-@pytest.fixture
-def aip():
-    return models.AIP(
-        id=421,
-        state='approved',
-        created=date(2012, 4, 21),
-        scope='general',
-        fragments=[
-            '# Design\n\nWhen designing an API, you need a good design.',
-            '## Guidance\n\nDesign well.',
-        ],
-        changelog={
-            models.Change(date=date(2020, 4, 21), message='Lorem ipsum.')
-        },
-        data={'foo': 'bar'},
-    )
+def test_placement(site):
+    christmas = site.aips[43]
+    assert christmas.placement.category == 'dickens'
+    assert christmas.placement.order == 10
+    sonnet = site.aips[1609]
+    assert sonnet.placement.category == 'misc'
+    assert sonnet.placement.order == float('inf')
 
 
-def test_content(aip):
-    assert aip.content.strip() == textwrap.dedent("""
-        # Design
-
-        When designing an API, you need a good design.
-
-        ## Guidance
-
-        Design well.
-
-        ## Changelog
-
-        - **2020-04-21:** Lorem ipsum.
-    """).strip()
+def test_redirects(site):
+    assert site.aips[43].redirects == {'/0043', '/043'}
+    assert site.aips[59].redirects == {'/0059', '/059', '/two-cities'}
+    assert site.aips[1622].redirects == {'/1622'}
 
 
-def test_placement_default(aip):
-    assert aip.placement == {
-        'category': 'misc',
-        'order': float('inf'),
-    }
+def test_relative_uri(site):
+    assert site.aips[43].relative_uri == '/43'
+    assert site.aips[1622].relative_uri == '/poetry/1622'
 
 
-def test_redirects(aip):
-    assert aip.redirects == {'/0421'}
-    aip.data['redirect_from'] = '/special-entrypoint'
-    assert aip.redirects == {'/0421', '/special-entrypoint'}
+def test_site(site):
+    assert all([i.site is site for i in site.aips.values()])
 
 
-def test_relative_uri(aip):
-    other = dataclasses.replace(aip, scope='other')
-    assert aip.relative_uri == '/421'
-    assert other.relative_uri == '/other/421'
+def test_title(site):
+    assert site.aips[43].title == 'A Christmas Carol'
+    assert site.aips[62].title == 'Les Misérables'
 
 
-def test_render(aip):
-    with mock.patch.object(models, 'Site', mocks.Site):
-        rendered = aip.render()
-        print(rendered)
-        assert '<h1>Design</h1>' in rendered
-        assert '<h2 id="guidance">Guidance</h2>' in rendered
-        assert '<h2 id="changelog">Changelog</h2>' in rendered
+def test_updated(site):
+    assert site.aips[62].updated == date(1862, 4, 21)
+    assert site.aips[43].updated == date(1844, 12, 25)
 
 
-def test_repo_path(aip):
-    assert aip.repo_path == '/aip/general/0421.md'
+def test_render(site):
+    rendered = site.aips[43].render()
+    assert '<h1>A Christmas Carol</h1>' in rendered
+    assert '<h2 id="guidance">Guidance</h2>' in rendered
+    assert '<h2 id="changelog">Changelog</h2>' in rendered
 
 
-def test_title(aip):
-    assert aip.title == 'Design'
-
-
-def test_updated(aip):
-    never_updated = dataclasses.replace(aip, changelog=set())
-    assert aip.updated == date(2020, 4, 21)
-    assert never_updated.updated == date(2012, 4, 21)
+def test_change_ordering():
+    a = Change(date=date(2020, 4, 21), message='Eight years')
+    b = Change(date=date(2012, 4, 21), message='Got married')
+    assert a < b

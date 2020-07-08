@@ -34,8 +34,8 @@ relative URI, etc.)
 
 There are three models that matter:
 
-- **Site:** A singleton (ish) that provides access to all scopes, AIPs, and
-  static pages. This is sent to every template as the `site` variable.
+- **Site:** A singleton that provides access to all scopes, AIPs, and static
+  pages. This is sent to every template as the `site` variable.
 - **AIP:** A representation of a single AIP, including both content and
   metadata. This is sent to the AIP rendering template as the `aip` variable.
 - **Scope:** A group of AIPs that apply to a particular scope. The "general"

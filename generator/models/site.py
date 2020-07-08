@@ -65,7 +65,7 @@ class Site:
     @property
     def base_url(self) -> str:
         """Return the site's base URL."""
-        return self.config.get('urls', {}).get('site', '/')
+        return self.config.get('urls', {}).get('site', '').rstrip('/')
 
     @property
     def pages(self) -> typing.Dict[str, Page]:
@@ -94,7 +94,7 @@ class Site:
 
     @property
     def repo_url(self) -> str:
-        return self.config.get('urls', {}).get('repo', '')
+        return self.config.get('urls', {}).get('repo', '').rstrip('/')
 
     @property
     def scopes(self) -> typing.Dict[str, Scope]:
