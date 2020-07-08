@@ -16,8 +16,8 @@ from __future__ import annotations
 import dataclasses
 import typing
 
-from generator import md
-from generator.env import jinja_env
+from aip_site import md
+from aip_site.env import jinja_env
 
 
 @dataclasses.dataclass(frozen=True)
@@ -49,4 +49,4 @@ class Page:
 
 
 if typing.TYPE_CHECKING:
-    from generator.models.site import Site
+    from aip_site.models.site import Site

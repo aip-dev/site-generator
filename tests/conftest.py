@@ -16,7 +16,7 @@ import os
 
 import pytest
 
-from generator.models.site import Site
+from aip_site.models.site import Site
 
 
 @pytest.fixture

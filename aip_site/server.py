@@ -17,11 +17,11 @@ import re
 from scss.compiler import compile_file  # type: ignore
 import flask
 
-from generator import env
-from generator.models.site import Site
+from aip_site import env
+from aip_site.models.site import Site
 
 
-app = flask.Flask('aip')
+app = flask.Flask('aip', static_folder='aip_site/support/assets/')
 app.jinja_env = env.jinja_env  # type: ignore
 
 
@@ -54,15 +54,15 @@ def page(page: str):
     return site.pages[page].render()
 
 
-@app.route('/static/css/<path:css_file>')
+@app.route('/assets/css/<path:css_file>')
 def scss(css_file: str):
     """Compile the given SCSS file and return it."""
     scss_file = re.sub(r'\.css$', '.scss', css_file)
-    css = compile_file(f'scss/{scss_file}')
+    css = compile_file(f'aip_site/support/scss/{scss_file}')
     return flask.Response(css, mimetype='text/css')
 
 
-@app.route('/static/js/search/tipuesearch_content.js')
+@app.route('/assets/js/search/tipuesearch_content.js')
 def search_content():
     """Compile the search content JavaScript and return it."""
     return flask.Response(

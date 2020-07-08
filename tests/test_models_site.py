@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from generator.models.aip import AIP
-from generator.models.page import Page
-from generator.models.scope import Scope
+from aip_site.models.aip import AIP
+from aip_site.models.page import Page
+from aip_site.models.scope import Scope
 
 
 def test_aips(site):

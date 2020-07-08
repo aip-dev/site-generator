@@ -17,9 +17,9 @@ import dataclasses
 import datetime
 import typing
 
-from generator import md
-from generator.env import jinja_env
-from generator.utils import cached_property
+from aip_site import md
+from aip_site.env import jinja_env
+from aip_site.utils import cached_property
 
 
 @dataclasses.dataclass(frozen=True)
@@ -116,5 +116,5 @@ class Placement:
 
 
 if typing.TYPE_CHECKING:
-    from generator.models.scope import Scope
-    from generator.models.site import Site
+    from aip_site.models.scope import Scope
+    from aip_site.models.site import Site

@@ -16,11 +16,11 @@ import os
 
 import jinja2
 
-from generator import md
+from aip_site import md
 
 
 TEMPLATE_DIR = os.path.realpath(
-    os.path.join(os.path.dirname(__file__), '..', 'templates'),
+    os.path.join(os.path.dirname(__file__), 'support', 'templates'),
 )
 
 

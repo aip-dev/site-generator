@@ -29,8 +29,8 @@ setup(
     packages=find_packages(exclude=['tests']),
     description='Static site generator for aip.dev and forks.',
     entry_points="""[console_scripts]
-        aip-site-gen=generator.cli:publish
-        aip-site-serve=generator.cli:serve
+        aip-site-gen=aip_site.cli:publish
+        aip-site-serve=aip_site.cli:serve
     """,
     platforms='Posix; MacOS X',
     include_package_data=True,

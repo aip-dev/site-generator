@@ -22,15 +22,15 @@ import typing
 from scss.compiler import compile_file  # type: ignore
 import click
 
-from generator import env
-from generator.models.aip import AIP
-from generator.models.scope import Scope
-from generator.models.site import Site
-from generator.models.page import Page
+from aip_site import env
+from aip_site.models.aip import AIP
+from aip_site.models.scope import Scope
+from aip_site.models.site import Site
+from aip_site.models.page import Page
 
 
-GENERATOR_ROOT = os.path.realpath(
-    os.path.join(os.path.dirname(__file__), '..'),
+SUPPORT_ROOT = os.path.realpath(
+    os.path.join(os.path.dirname(__file__), 'support'),
 )
 
 
@@ -59,13 +59,13 @@ class Publisher:
         self.publish_template('index.html.j2', 'index.html')
         self.publish_template('search.html.j2', 'search.html')
 
-        # Copy over static files verbatim.
-        self.publish_static()
+        # Copy over assets files verbatim.
+        self.publish_assets()
 
-        # Publish dynamic content that goes in the static directory.
+        # Publish dynamic content that goes in the assets directory.
         self.publish_template(
             'search.js.j2',
-            'static/js/search/tipuesearch_content.js',
+            'assets/js/search/tipuesearch_content.js',
         )
         self.publish_css()
 
@@ -102,19 +102,19 @@ class Publisher:
             ))
         self.log(f'Successfully wrote {path}.')
 
-    def publish_static(self):
-        """Copy the static directory."""
+    def publish_assets(self):
+        """Copy the assets directory."""
         shutil.copytree(
-            src=os.path.join(GENERATOR_ROOT, 'static'),
-            dst=os.path.join(self.output_dir, 'static'),
+            src=os.path.join(SUPPORT_ROOT, 'assets'),
+            dst=os.path.join(self.output_dir, 'assets'),
             dirs_exist_ok=True,
         )
-        self.log('Successfully wrote static files.')
+        self.log('Successfully wrote asset files.')
 
     def publish_css(self):
         """Compile and publish all SCSS files in the root SCSS directory."""
-        scss_path = os.path.join(GENERATOR_ROOT, 'scss')
-        css_path = os.path.join(self.output_dir, 'static', 'css')
+        scss_path = os.path.join(SUPPORT_ROOT, 'scss')
+        css_path = os.path.join(self.output_dir, 'assets', 'css')
         os.makedirs(css_path, exist_ok=True)
         for scss_file in os.listdir(scss_path):
             if not scss_file.endswith('.scss'):

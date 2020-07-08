@@ -16,7 +16,7 @@ import textwrap
 
 import pytest
 
-from generator import md
+from aip_site import md
 
 
 @pytest.fixture

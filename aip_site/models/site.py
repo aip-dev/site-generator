@@ -23,12 +23,12 @@ import uuid
 
 import yaml
 
-from generator import md
-from generator.env import jinja_env
-from generator.models.aip import AIP
-from generator.models.page import Page
-from generator.models.scope import Scope
-from generator.utils import cached_property
+from aip_site import md
+from aip_site.env import jinja_env
+from aip_site.models.aip import AIP
+from aip_site.models.page import Page
+from aip_site.models.scope import Scope
+from aip_site.utils import cached_property
 
 
 @dataclasses.dataclass(frozen=True)

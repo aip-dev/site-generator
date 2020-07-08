@@ -14,7 +14,7 @@
 
 from datetime import date
 
-from generator.models.aip import Change
+from aip_site.models.aip import Change
 
 
 def test_content(site):

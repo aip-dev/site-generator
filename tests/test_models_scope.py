@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from generator.models.aip import AIP
+from aip_site.models.aip import AIP
 
 
 def test_aips(site):

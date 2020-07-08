@@ -14,7 +14,7 @@
 
 import tempfile
 
-from generator.publisher import Publisher
+from aip_site.publisher import Publisher
 
 
 def test_publisher():

@@ -21,10 +21,10 @@ import typing
 
 import yaml
 
-from generator.env import jinja_env
-from generator.models.aip import AIP
-from generator.models.aip import Change
-from generator.utils import cached_property
+from aip_site.env import jinja_env
+from aip_site.models.aip import AIP
+from aip_site.models.aip import Change
+from aip_site.utils import cached_property
 
 
 @dataclasses.dataclass(frozen=True)
@@ -131,4 +131,4 @@ class Category:
 
 
 if typing.TYPE_CHECKING:
-    from generator.models.site import Site
+    from aip_site.models.site import Site

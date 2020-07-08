@@ -17,8 +17,8 @@ from unittest import mock
 from click.testing import CliRunner
 import flask
 
-from generator import cli
-from generator.publisher import Publisher
+from aip_site import cli
+from aip_site.publisher import Publisher
 
 
 def test_publish():
