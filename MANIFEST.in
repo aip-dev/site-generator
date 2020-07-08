@@ -1,0 +1,6 @@
+include README.md CONTRIBUTING.md LICENSE
+recursive-include scss *
+recursive-include static *
+recursive-include templates *
+global-exclude *.py[co]
+global-exclude __pycache__

@@ -48,11 +48,6 @@ setup(
         'six==1.15.0',
         'werkzeug==1.0.1',
     ),
-    tests_require=(
-        'coverage',
-        'pytest',
-        'pytest-cov',
-    ),
     python_requires='>=3.8',
     classifiers=(
         'Development Status :: 4 - Beta',
