@@ -30,6 +30,7 @@ setup(
     description='Static site generator for aip.dev and forks.',
     entry_points="""[console_scripts]
         aip-site-gen=generator.cli:publish
+        aip-site-serve=generator.cli:serve
     """,
     platforms='Posix; MacOS X',
     include_package_data=True,

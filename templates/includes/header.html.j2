@@ -24,9 +24,9 @@
       <div class="glue-header__container glue-header__container--flex-auto">
         <nav class="glue-header__link-bar">
           <ul id="list-1" class="glue-header__list">
-            {% for link in site.data.header.links %}
+            {% for link in site.config.header.links %}
               {% if link.relative_url is defined %}
-                <li class="glue-header__item{% if site.path == link.relative_url %} glue-header--is-active{% endif %}">
+                <li class="glue-header__item{% if path | default('/') == link.relative_url %} glue-header--is-active{% endif %}">
                   <a class="glue-header__link" href="{{ site.relative_uri }}{{ link.relative_url }}" aria-level="1">{{ link.title }}</a>
                 </li>
               {% else %}

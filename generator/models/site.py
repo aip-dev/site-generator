@@ -28,6 +28,7 @@ from generator.env import jinja_env
 from generator.models.aip import AIP
 from generator.models.page import Page
 from generator.models.scope import Scope
+from generator.utils import cached_property
 
 
 @dataclasses.dataclass(frozen=True)
@@ -41,9 +42,9 @@ class Site:
         # Load all site configuration.
         config: typing.Dict[str, typing.Any] = {}
         config_dir = os.path.join(base_dir, 'config')
-        for filename in os.listdir(config_dir):
-            with io.open(os.path.join(config_dir, 'filename'), 'r') as f:
-                config[filename[:-5]] = yaml.safe_load(f)
+        for fn in os.listdir(config_dir):
+            with io.open(os.path.join(config_dir, fn), 'r') as f:
+                config[fn[:-5]] = yaml.safe_load(f)
 
         # Return a new Site object.
         return cls(
@@ -52,44 +53,40 @@ class Site:
             revision=str(uuid.uuid4())[-8:],
         )
 
-    @property
+    @cached_property
     def aips(self) -> typing.Dict[int, AIP]:
         """Return all the AIPs in the site."""
-        if not hasattr(self, '_aips'):
-            answer = collections.OrderedDict()
-            for scope in self.scopes.values():
-                for id, aip in scope.aips.items():
-                    answer[id] = aip
-            self._aips = answer
-        return self._aips
+        answer = collections.OrderedDict()
+        for scope in self.scopes.values():
+            for id, aip in scope.aips.items():
+                answer[id] = aip
+        return answer
 
     @property
     def base_url(self) -> str:
         """Return the site's base URL."""
-        return self.config.get('urls', {}).get('base', '/')
+        return self.config.get('urls', {}).get('site', '/')
 
     @property
     def pages(self) -> typing.Dict[str, Page]:
         """Return all of the static pages in the site."""
-        if not hasattr(self, '_pages'):
-            # The CONTRIBUTING.md file is a special case: we need it in the
-            # root so GitHub will find it.
-            answer = {'contributing': self._load_page(
-                os.path.join(self.base_dir, 'CONTRIBUTING.md'),
-            )}
+        # The CONTRIBUTING.md file is a special case: we need it in the
+        # root so GitHub will find it.
+        answer = {'contributing': self._load_page(
+            os.path.join(self.base_dir, 'CONTRIBUTING.md'),
+        )}
 
-            # Iterate over the pages directory and load static pages.
-            page_dir = os.path.join(self.base_dir, 'pages')
-            for fn in os.listdir(page_dir):
-                # Sanity check: Ignore non-Markdown files.
-                if not fn.endswith(('.md', '.md.j2')):
-                    continue
+        # Iterate over the pages directory and load static pages.
+        page_dir = os.path.join(self.base_dir, 'pages')
+        for fn in os.listdir(page_dir):
+            # Sanity check: Ignore non-Markdown files.
+            if not fn.endswith(('.md', '.md.j2')):
+                continue
 
-                # Load the page and add it to the pages dictionary.
-                page = self._load_page(os.path.join(page_dir, fn))
-                answer[page.code] = page
-            self._pages = answer
-        return self._pages
+            # Load the page and add it to the pages dictionary.
+            page = self._load_page(os.path.join(page_dir, fn))
+            answer[page.code] = page
+        return answer
 
     @property
     def relative_uri(self) -> str:
@@ -102,39 +99,37 @@ class Site:
     @property
     def scopes(self) -> typing.Dict[str, Scope]:
         """Return all of the AIP scopes present in the site."""
-        if not hasattr(self, '_scopes'):
-            answer_list = []
-            aip_dir = os.path.join(self.base_dir, 'aip')
-            for fn in os.listdir(aip_dir):
-                # If there is a scope.yaml file, then this is a scope directory
-                # and we add it to our list.
-                scope_file = os.path.join(aip_dir, fn, 'scope.yaml')
-                if not os.path.exists(scope_file):
-                    continue
+        answer_list = []
+        aip_dir = os.path.join(self.base_dir, 'aip')
+        for fn in os.listdir(aip_dir):
+            # If there is a scope.yaml file, then this is a scope directory
+            # and we add it to our list.
+            scope_file = os.path.join(aip_dir, fn, 'scope.yaml')
+            if not os.path.exists(scope_file):
+                continue
 
-                # Open the scope's configuration file and create a Scope
-                # object based on it.
-                with io.open(scope_file, 'r') as f:
-                    conf = yaml.safe_load(f)
-                code = conf.pop('code', fn)
-                scope = Scope(
-                    base_dir=os.path.join(aip_dir, fn),
-                    code=code,
-                    config=conf,
-                    order=conf.pop('order', float('inf')),
-                    site=self,
-                    title=conf.pop('title', code.capitalize()),
-                )
+            # Open the scope's configuration file and create a Scope
+            # object based on it.
+            with io.open(scope_file, 'r') as f:
+                conf = yaml.safe_load(f)
+            code = conf.pop('code', fn)
+            scope = Scope(
+                base_dir=os.path.join(aip_dir, fn),
+                code=code,
+                config=conf,
+                order=conf.pop('order', float('inf')),
+                site=self,
+                title=conf.pop('title', code.capitalize()),
+            )
 
-                # Append the scope to our list.
-                answer_list.append(scope)
+            # Append the scope to our list.
+            answer_list.append(scope)
 
-            # Create an ordered dictionary of scopes.
-            answer = collections.OrderedDict()
-            for scope in sorted(answer_list, key=lambda i: i.order):
-                answer[scope.code] = scope
-            self._scopes = answer
-        return self._scopes
+        # Create an ordered dictionary of scopes.
+        answer = collections.OrderedDict()
+        for scope in sorted(answer_list, key=lambda i: i.order):
+            answer[scope.code] = scope
+        return answer
 
     def _load_page(self, md_file: str) -> Page:
         """Load a support page and return a new Page object."""

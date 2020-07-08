@@ -41,7 +41,7 @@
       {% block main %}
       <main role="main" id="page-content">
         {% block nav -%}
-        {{ nav.render_nav(site) -}}
+        {{ nav.render_nav(site, path) -}}
         {% endblock -%}
         <section id="jump-content">
           {% block content %}

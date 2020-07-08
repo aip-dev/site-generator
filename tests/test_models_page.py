@@ -45,7 +45,7 @@ def test_load_template():
     mock_open = mock.mock_open(read_data=textwrap.dedent("""
         # Template
 
-        The path value is {{ site.path }}.
+        The path value is {{ path }}.
     """).strip())
     mock_site = mocks.Site.load(path='/foo')
     with mock.patch.object(models.Site, 'load', return_value=mock_site):

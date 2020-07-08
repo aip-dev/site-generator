@@ -23,6 +23,7 @@ import yaml
 
 from generator.env import jinja_env
 from generator.models.aip import AIP
+from generator.utils import cached_property
 
 
 @dataclasses.dataclass(frozen=True)
@@ -34,82 +35,77 @@ class Scope:
     site: Site
     config: typing.Dict[str, typing.Any]
 
-    @property
+    @cached_property
     def aips(self) -> typing.Dict[int, AIP]:
         """Return a dict of AIPs, sorted by number."""
-        if not hasattr(self, '_aips'):
-            answer = []
+        answer = []
 
-            # Load each AIP under this scope.
-            # Similar to scopes, AIPs are detected based solely on
-            # presence of file on disk.
-            for fn in os.listdir(self.base_dir):
-                aip_file = os.path.join(self.base_dir, fn)
+        # Load each AIP under this scope.
+        # Similar to scopes, AIPs are detected based solely on
+        # presence of file on disk.
+        for fn in os.listdir(self.base_dir):
+            aip_file = os.path.join(self.base_dir, fn)
 
-                # Sanity check: Does this look like an AIP?
-                if not fn.endswith('.md'):
-                    continue
+            # Sanity check: Does this look like an AIP?
+            if not fn.endswith('.md'):
+                continue
 
-                # Load the AIP.
-                with io.open(aip_file, 'r') as f:
-                    contents = f.read()
+            # Load the AIP.
+            with io.open(aip_file, 'r') as f:
+                contents = f.read()
 
-                # Parse out the front matter from the Markdown content.
-                fm, body = contents.lstrip('-\n').split('---\n', maxsplit=1)
-                meta = yaml.safe_load(fm)
+            # Parse out the front matter from the Markdown content.
+            fm, body = contents.lstrip('-\n').split('---\n', maxsplit=1)
+            meta = yaml.safe_load(fm)
 
-                # Create the AIP object.
-                answer.append(AIP(
-                    id=meta.pop('id'),
-                    body=body,
-                    config=meta,
-                    created=meta.pop('created'),
-                    repo_path=aip_file[len(self.site.base_dir):],
-                    scope=self,
-                    state=meta.pop('state'),
-                ))
+            # Create the AIP object.
+            answer.append(AIP(
+                id=meta.pop('id'),
+                body=body,
+                config=meta,
+                created=meta.pop('created'),
+                repo_path=aip_file[len(self.site.base_dir):],
+                scope=self,
+                state=meta.pop('state'),
+            ))
 
-            answer = sorted(answer, key=lambda i: i.id)
-            self._aips = collections.OrderedDict([(i.id, i) for i in answer])
-        return self._aips
+        answer = sorted(answer, key=lambda i: i.id)
+        return collections.OrderedDict([(i.id, i) for i in answer])
 
-    @property
+    @cached_property
     def categories(self) -> typing.Dict[str, Category]:
-        if not hasattr(self, '_categories'):
-            # There may be no categories. This is fine; just "fake" a single
-            # category based on the scope.
-            #
-            # This is guaranteed to have all AIPs, so just return immediately
-            # and skip remaining processing.
-            if not self.config.get('categories', None):
-                self._categories = {self.code: Category(
-                    code=self.code,
-                    title=self.title,
-                    order=0,
-                    aips=self.aips,
-                )}
-                return self._categories
+        # There may be no categories. This is fine; just "fake" a single
+        # category based on the scope.
+        #
+        # This is guaranteed to have all AIPs, so just return immediately
+        # and skip remaining processing.
+        if not self.config.get('categories', None):
+            return {self.code: Category(
+                code=self.code,
+                title=self.title,
+                order=0,
+                aips=self.aips,
+            )}
 
-            # Iterate over each category and piece together the AIPs in order.
-            cats = collections.OrderedDict()
-            for ix, cat in enumerate(self.config['categories']):
-                # Determine what AIPs are in this category.
-                aips: typing.List[AIP] = []
-                for aip in self.aips.values():
-                    if aip.placement.category != cat['code']:
-                        continue
-                    aips.append(aip)
-                aips = sorted(aips, key=lambda i: i.placement.order)
+        # Iterate over each category and piece together the AIPs in order.
+        cats = collections.OrderedDict()
+        for ix, cat in enumerate(self.config['categories']):
+            # Determine what AIPs are in this category.
+            aips: typing.List[AIP] = []
+            for aip in self.aips.values():
+                if aip.placement.category != cat['code']:
+                    continue
+                aips.append(aip)
+            aips = sorted(aips, key=lambda i: i.placement.order)
 
-                # Create the category object and add it.
-                cats[cat['code']] = Category(
-                    code=cat['code'],
-                    title=cat.get('title', cat['code'].capitalize()),
-                    order=ix,
-                    aips=collections.OrderedDict([(i.id, i) for i in aips]),
-                )
-            self._categories = cats
-        return self._categories
+            # Create the category object and add it.
+            cats[cat['code']] = Category(
+                code=cat['code'],
+                title=cat.get('title', cat['code'].capitalize()),
+                order=ix,
+                aips=collections.OrderedDict([(i.id, i) for i in aips]),
+            )
+        return cats
 
     @property
     def relative_uri(self) -> str:

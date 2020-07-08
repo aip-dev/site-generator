@@ -22,6 +22,7 @@ import yaml
 
 from generator import md
 from generator.env import jinja_env
+from generator.utils import cached_property
 
 
 @dataclasses.dataclass(frozen=True)
@@ -35,16 +36,14 @@ class AIP:
     config: typing.Dict[str, typing.Any]
     changelog: typing.Set[Change] = dataclasses.field(default_factory=set)
 
-    @property
+    @cached_property
     def content(self) -> md.MarkdownDocument:
-        if not hasattr(self, '_md_content'):
-            answer = self.body
-            if self.changelog:
-                answer += '\n\n## Changelog\n\n'
-                for cl in sorted(self.changelog):
-                    answer += f'- **{cl.date}:** {cl.message}\n'
-            self._md_content = md.MarkdownDocument(answer)
-        return self._md_content
+        answer = self.body
+        if self.changelog:
+            answer += '\n\n## Changelog\n\n'
+            for cl in sorted(self.changelog):
+                answer += f'- **{cl.date}:** {cl.message}\n'
+        return md.MarkdownDocument(answer)
 
     @property
     def placement(self) -> Placement:
@@ -62,8 +61,8 @@ class AIP:
     @property
     def relative_uri(self) -> str:
         """Return the relative URI for this AIP."""
-        if self.scope != 'general':
-            return f'/{self.scope}/{self.id}'
+        if self.scope.code != 'general':
+            return f'/{self.scope.code}/{self.id}'
         return f'/{self.id}'
 
     @property
@@ -102,7 +101,7 @@ class AIP:
             self.changelog.add(Change(**cl))
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class Change:
     date: datetime.date
     message: str

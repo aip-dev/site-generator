@@ -14,7 +14,7 @@ AIP-{{ aip.id }}: {{ aip.title }}
 {% endblock %}
 
 {% block nav %}
-{{ nav.render_nav(site, scope_code=aip.scope) -}}
+{{ nav.render_nav(site, path, scope_code=aip.scope.code) -}}
 {% endblock %}
 
 {% block content %}
@@ -26,16 +26,14 @@ AIP-{{ aip.id }}: {{ aip.title }}
     {% with permalink = site.base_url + aip.relative_uri -%}
     <tr><td>Permalink</td><td><a href="{{ permalink }}">{{ permalink.lstrip('htps')[3:] }}</a></td></tr>
     {% endwith -%}
-    {% if aip.scope != 'general' -%}
-    <tr><td>Scope</td><td>{{ site.scopes[aip.scope].title }}</td></tr>
+    {% if aip.scope.code != 'general' -%}
+    <tr><td>Scope</td><td>{{ aip.scope.title }}</td></tr>
     {% endif -%}
     {% if aip.state -%}
     <tr><td>State</td><td>{{ aip.state | capitalize }}</td></tr>
     {% endif -%}
     <tr><td>Created</td><td>{{ aip.created }}</td></tr>
-    {% if not aip.legacy -%}
     <tr><td>Updated</td><td>{{ aip.updated }}</td></tr>
-    {% endif -%}
   </table>
 
   {# Table of contents -#}

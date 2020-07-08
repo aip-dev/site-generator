@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from __future__ import annotations
-import dataclasses
 import io
 import os
 import re
@@ -28,6 +27,11 @@ from generator.models.aip import AIP
 from generator.models.scope import Scope
 from generator.models.site import Site
 from generator.models.page import Page
+
+
+GENERATOR_ROOT = os.path.realpath(
+    os.path.join(os.path.dirname(__file__), '..'),
+)
 
 
 class Publisher:
@@ -96,14 +100,15 @@ class Publisher:
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with io.open(path, 'w') as f:
             f.write(env.jinja_env.get_template(tmpl).render(
-                site=dataclasses.replace(self.site, path=path.split('.')[0]),
+                site=self.site,
+                path=path.split('.')[0],
             ))
         self.log(f'Successfully wrote {path}.')
 
     def publish_static(self):
         """Copy the static directory."""
         shutil.copytree(
-            src=os.path.join(self.site.base_dir, 'static'),
+            src=os.path.join(GENERATOR_ROOT, 'static'),
             dst=os.path.join(self.output_dir, 'static'),
             dirs_exist_ok=True,
         )
@@ -111,7 +116,7 @@ class Publisher:
 
     def publish_css(self):
         """Compile and publish all SCSS files in the root SCSS directory."""
-        scss_path = os.path.join(self.site.base_dir, 'scss')
+        scss_path = os.path.join(GENERATOR_ROOT, 'scss')
         css_path = os.path.join(self.output_dir, 'static', 'css')
         os.makedirs(css_path, exist_ok=True)
         for scss_file in os.listdir(scss_path):

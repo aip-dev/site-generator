@@ -16,7 +16,7 @@
       Focused design documents for flexible API development.
     </div>
     <div class="aip-buttons">
-      {% for button in site.data.hero.buttons -%}
+      {% for button in site.config.hero.buttons -%}
       <a href="{{ site.relative_uri }}{{ button.href }}" class="glue-button glue-button--high-emphasis">
         {{ button.text }}
       </a>
@@ -34,7 +34,7 @@
   </div>
 
   <div class="aip-shortcuts glue-grid glue-grid__col--align-middle">
-    {% for shortcut in site.data.hero.shortcuts %}
+    {% for shortcut in site.config.hero.shortcuts %}
     <div class="aip-shortcut glue-grid__col glue-grid__col--span-6">
       <h1>{{ shortcut.title }}</h1>
       <div>{{ shortcut.description }}</div>

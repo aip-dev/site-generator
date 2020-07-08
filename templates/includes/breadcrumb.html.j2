@@ -1,6 +1,6 @@
 <section class="section-breadcrumbs">
   <nav
-    class="glue-breadcrumbs glue-mod-mt-std glue-mod-mb-std{% if site.path == '/home' %} no-breadcrumb{% endif %}"
+    class="glue-breadcrumbs glue-mod-mt-std glue-mod-mb-std{% if path == '/home' %} no-breadcrumb{% endif %}"
     aria-label="You are here."
   >
     <ol class="glue-breadcrumbs__list aip-breadcrumbs">
@@ -11,8 +11,8 @@
       </li>
       {% if aip is defined %}
       <li class="glue-breadcrumbs__item" aria-level="2">
-        <a class="glue-breadcrumbs__link" href="{{ site.relative_uri }}/{{ aip.scope }}">
-          {{ site.scopes[aip.scope].title }} AIPs
+        <a class="glue-breadcrumbs__link" href="{{ site.relative_uri }}/{{ aip.scope.code }}">
+          {{ aip.scope.title }} AIPs
         </a>
       </li>
       {% elif newsletter is defined %}
