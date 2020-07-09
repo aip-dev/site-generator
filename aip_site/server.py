@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import re
 
 from scss.compiler import compile_file  # type: ignore
@@ -21,7 +22,8 @@ from aip_site import env
 from aip_site.models.site import Site
 
 
-app = flask.Flask('aip', static_folder='aip_site/support/assets/')
+ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
+app = flask.Flask('aip', static_folder=f'{ROOT}/aip_site/support/assets/')
 app.jinja_env = env.jinja_env  # type: ignore
 
 
@@ -58,7 +60,7 @@ def page(page: str):
 def scss(css_file: str):
     """Compile the given SCSS file and return it."""
     scss_file = re.sub(r'\.css$', '.scss', css_file)
-    css = compile_file(f'aip_site/support/scss/{scss_file}')
+    css = compile_file(f'{ROOT}/aip_site/support/scss/{scss_file}')
     return flask.Response(css, mimetype='text/css')
 
 
