@@ -21,9 +21,13 @@ def test_content(site):
     christmas = site.aips[43]
     assert 'Marley was dead' in christmas.content
     assert '## Changelog' in christmas.content
+
     tale = site.aips[59]
     assert 'It was the best of times' in tale.content
     assert 'Changelog' not in tale.content
+
+    hunchback = site.aips[31]
+    assert '[AIP-62](/62)' in hunchback.content
 
 
 def test_placement(site):

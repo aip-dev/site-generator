@@ -15,6 +15,7 @@
 from __future__ import annotations
 import dataclasses
 import datetime
+import re
 import typing
 
 from aip_site import md
@@ -36,10 +37,20 @@ class AIP:
     @cached_property
     def content(self) -> md.MarkdownDocument:
         answer = self.body
+
+        # Hotlink AIP references.
+        # We only hotlink the generally-applicable ones for now until we have
+        # a prefix system implemented.
+        answer = re.sub(r'\b\[aip-([\d]{1,3})\]\b', r'(/\1)', answer)
+        answer = re.sub(r'\bAIP-([\d]{1,3})\b', r'[AIP-\1](/\1)', answer)
+
+        # Append the changelog if there is one.
         if self.changelog:
             answer += '\n\n## Changelog\n\n'
             for cl in sorted(self.changelog):
                 answer += f'- **{cl.date}:** {cl.message}\n'
+
+        # Return the document.
         return md.MarkdownDocument(answer)
 
     @property
