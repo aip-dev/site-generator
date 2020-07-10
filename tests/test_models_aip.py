@@ -18,14 +18,17 @@ from aip_site.models.aip import Change
 
 
 def test_content(site):
+    # Test with a changelog.
     christmas = site.aips[43]
     assert 'Marley was dead' in christmas.content
     assert '## Changelog' in christmas.content
 
+    # Test without a changelog.
     tale = site.aips[59]
     assert 'It was the best of times' in tale.content
     assert 'Changelog' not in tale.content
 
+    # Test hotlinking of AIP-###.
     hunchback = site.aips[31]
     assert '[AIP-62](/62)' in hunchback.content
 
