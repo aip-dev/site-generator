@@ -7,6 +7,27 @@
 {% endblock %}
 
 {% block content %}
+<aside id="aip-sidebar" class="docs-component-sidebar">
+  {# Table of Contents -#}
+  <section id="aip-toc" class="docs-component-sidebar-toc">
+    <div class="toc">
+      <span class="toctitle">Categories</span>
+      <ul>
+        {% for cat in scope.categories.values() -%}
+        <li><a href="#{{ cat.code }}">{{ cat.title }}</a></li>
+        {% endfor -%}
+      </ul>
+    </div>
+  </section>
+
+  {# Action links -#}
+  <section class="docs-component-sidebar-actions">
+    <ul>
+      <li><a href="{{ site.repo_url }}/issues/">File Bug</a></li>
+    </ul>
+  </section>
+</aside>
+
 <section id="aip-main" class="docs-component-main">
   {% with title = '{0} AIPs'.format(scope.title) -%}
     {% include 'includes/breadcrumb.html.j2' %}
@@ -14,7 +35,7 @@
 
   {% for cat in scope.categories.values() -%}
   {% if cat.aips -%}
-  <h3>{{ cat.title }}</h3>
+  <h3 id="{{ cat.code }}">{{ cat.title }}</h3>
   <table class="aip-listing">
     <thead>
       <tr>
