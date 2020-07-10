@@ -18,11 +18,12 @@ import typing
 
 from aip_site import md
 from aip_site.env import jinja_env
+from aip_site.utils import cached_property
 
 
 @dataclasses.dataclass(frozen=True)
 class Page:
-    content: md.MarkdownDocument
+    body: md.MarkdownDocument
     repo_path: str
     site: Site
     config: typing.Dict[str, typing.Any]
@@ -30,6 +31,19 @@ class Page:
     @property
     def code(self) -> str:
         return self.repo_path.split('/')[-1].split('.')[0].lower()
+
+    @cached_property
+    def content(self) -> md.MarkdownDocument:
+        """Return the Markdown content for this page."""
+        # If this was originally a Jinja template, then we need to render
+        # this specific content in isolation (apart from the page template).
+        if self.repo_path.endswith('.j2'):
+            return md.MarkdownDocument(
+                jinja_env.from_string(self.body).render(site=self.site),
+            )
+
+        # This is not a template; just return the body directly.
+        return self.body
 
     @property
     def relative_uri(self) -> str:

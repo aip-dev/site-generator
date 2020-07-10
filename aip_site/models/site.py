@@ -24,7 +24,6 @@ import uuid
 import yaml
 
 from aip_site import md
-from aip_site.env import jinja_env
 from aip_site.models.aip import AIP
 from aip_site.models.page import Page
 from aip_site.models.scope import Scope
@@ -135,12 +134,7 @@ class Site:
         """Load a support page and return a new Page object."""
         # Read the page file from disk.
         with io.open(md_file, 'r') as f:
-            content = f.read()
-
-        # If the path is a Jinja template, resolve the content.
-        # Only the site is sent as context in this case.
-        if md_file.endswith('.j2'):
-            content = jinja_env.from_string(content).render(site=self)
+            body = f.read()
 
         # Check for a config file. If one exists, load it too.
         config_file = re.sub(r'\.md(\.j2)?$', '.yaml', md_file)
@@ -151,8 +145,8 @@ class Site:
 
         # Return the page.
         return Page(
+            body=md.MarkdownDocument(body),
             config=config,
-            content=md.MarkdownDocument(content),
             repo_path=md_file[len(self.base_dir):],
             site=self,
         )

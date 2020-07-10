@@ -18,6 +18,12 @@ def test_code(site):
     assert site.pages['faq'].code == 'faq'
 
 
+def test_content(site):
+    assert '- Blue\n' in site.pages['faq'].content
+    assert '- Yellow\n' in site.pages['faq'].content
+    assert '{% for' not in site.pages['faq'].content
+
+
 def test_relative_uri(site):
     assert site.pages['contributing'].relative_uri == '/contributing'
     assert site.pages['faq'].relative_uri == '/faq'
