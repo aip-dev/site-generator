@@ -48,12 +48,13 @@ def search():
 
 
 @app.route('/<page>')
-def page(page: str):
+@app.route('/<collection>/<page>')
+def page(page: str, collection: str = 'general'):
     """Display a static page or listing of AIPs in a given scope."""
     site = flask.g.site
     if page in site.scopes:
         return site.scopes[page].render()
-    return site.pages[page].render()
+    return site.collections[collection].pages[page].render()
 
 
 @app.route('/assets/css/<path:css_file>')

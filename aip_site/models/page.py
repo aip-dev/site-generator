@@ -14,7 +14,12 @@
 
 from __future__ import annotations
 import dataclasses
+import io
+import re
+import os
 import typing
+
+import yaml
 
 from aip_site import md
 from aip_site.env import jinja_env
@@ -25,11 +30,15 @@ from aip_site.utils import cached_property
 class Page:
     body: md.MarkdownDocument
     repo_path: str
-    site: Site
+    collection: Collection
     config: typing.Dict[str, typing.Any]
 
     @property
     def code(self) -> str:
+        """Return this page's code.
+
+        Note: Uniqueness is only guaranteed within the collection.
+        """
         return self.repo_path.split('/')[-1].split('.')[0].lower()
 
     @cached_property
@@ -47,7 +56,11 @@ class Page:
 
     @property
     def relative_uri(self) -> str:
-        return f'/{self.code}'
+        return f'/{self.collection.code}/{self.code}'.replace('/general', '')
+
+    @property
+    def site(self) -> Site:
+        return self.collection.site
 
     @property
     def title(self) -> str:
@@ -59,6 +72,60 @@ class Page:
             page=self,
             path=self.relative_uri,
             site=self.site,
+        )
+
+
+@dataclasses.dataclass(frozen=True)
+class Collection:
+    code: str
+    site: Site
+
+    @property
+    def base_dir(self) -> str:
+        return os.path.join(self.site.base_dir, 'pages', self.code)
+
+    @cached_property
+    def pages(self) -> typing.Dict[str, Page]:
+        """Return the pages in this collection."""
+        answer = {}
+
+        # For the general collection, the CONTRIBUTING.md file is a special
+        # case: we need it in the root so GitHub will find it.
+        if self.code == 'general':
+            answer['contributing'] = self._load_page(
+                os.path.join(self.site.base_dir, 'CONTRIBUTING.md'),
+            )
+
+        # Iterate over the pages directory and load static pages.
+        for fn in os.listdir(self.base_dir):
+            # Sanity check: Ignore non-Markdown files.
+            if not fn.endswith(('.md', '.md.j2')):
+                continue
+
+            # Load the page and add it to the pages dictionary.
+            page = self._load_page(os.path.join(self.base_dir, fn))
+            answer[page.code] = page
+        return answer
+
+    def _load_page(self, md_file: str) -> Page:
+        """Load a support page and return a new Page object."""
+        # Read the page file from disk.
+        with io.open(md_file, 'r') as f:
+            body = f.read()
+
+        # Check for a config file. If one exists, load it too.
+        config_file = re.sub(r'\.md(\.j2)?$', '.yaml', md_file)
+        config = {}
+        if os.path.exists(config_file):
+            with io.open(config_file, 'r') as f:
+                config = yaml.safe_load(f)
+
+        # Return the page.
+        return Page(
+            body=md.MarkdownDocument(body),
+            collection=self,
+            config=config,
+            repo_path=md_file[len(self.site.base_dir):],
         )
 
 

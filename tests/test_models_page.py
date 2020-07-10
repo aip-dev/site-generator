@@ -13,6 +13,14 @@
 # limitations under the License.
 
 
+def test_collections(site):
+    assert 'general' in site.collections
+    assert 'authors' in site.collections
+    assert 'red-herring' not in site.collections
+    assert 'dickens' not in site.collections['general'].pages
+    assert 'faq' not in site.collections['authors'].pages
+
+
 def test_code(site):
     assert site.pages['contributing'].code == 'contributing'
     assert site.pages['faq'].code == 'faq'
@@ -27,12 +35,14 @@ def test_content(site):
 def test_relative_uri(site):
     assert site.pages['contributing'].relative_uri == '/contributing'
     assert site.pages['faq'].relative_uri == '/faq'
+    assert site.pages['authors/dickens'].relative_uri == '/authors/dickens'
 
 
 def test_repo_path(site):
     assert site.pages['contributing'].repo_path == '/CONTRIBUTING.md'
-    assert site.pages['faq'].repo_path == '/pages/faq.md.j2'
-    assert site.pages['licensing'].repo_path == '/pages/licensing.md'
+    assert site.pages['faq'].repo_path == '/pages/general/faq.md.j2'
+    assert site.pages['licensing'].repo_path == '/pages/general/licensing.md'
+    assert site.pages['authors/hugo'].repo_path == '/pages/authors/hugo.md'
 
 
 def test_render(site):

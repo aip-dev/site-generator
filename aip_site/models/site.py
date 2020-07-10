@@ -17,14 +17,13 @@ import collections
 import dataclasses
 import io
 import os
-import re
 import typing
 import uuid
 
 import yaml
 
-from aip_site import md
 from aip_site.models.aip import AIP
+from aip_site.models.page import Collection
 from aip_site.models.page import Page
 from aip_site.models.scope import Scope
 from aip_site.utils import cached_property
@@ -66,25 +65,28 @@ class Site:
         """Return the site's base URL."""
         return self.config.get('urls', {}).get('site', '').rstrip('/')
 
+    @cached_property
+    def collections(self) -> typing.Dict[str, Collection]:
+        """Return all of the page collections in the site."""
+        pages_dir = os.path.join(self.base_dir, 'pages')
+        answer = {}
+        for dirname in os.listdir(pages_dir):
+            # Sanity check: Is this a directory?
+            if not os.path.isdir(os.path.join(pages_dir, dirname)):
+                continue
+            answer[dirname] = Collection(code=dirname, site=self)
+        return answer
+
     @property
     def pages(self) -> typing.Dict[str, Page]:
         """Return all of the static pages in the site."""
-        # The CONTRIBUTING.md file is a special case: we need it in the
-        # root so GitHub will find it.
-        answer = {'contributing': self._load_page(
-            os.path.join(self.base_dir, 'CONTRIBUTING.md'),
-        )}
-
-        # Iterate over the pages directory and load static pages.
-        page_dir = os.path.join(self.base_dir, 'pages')
-        for fn in os.listdir(page_dir):
-            # Sanity check: Ignore non-Markdown files.
-            if not fn.endswith(('.md', '.md.j2')):
-                continue
-
-            # Load the page and add it to the pages dictionary.
-            page = self._load_page(os.path.join(page_dir, fn))
-            answer[page.code] = page
+        answer = {}
+        for col in self.collections.values():
+            for page in col.pages.values():
+                # Disambiguate the pages from one another, but treat the
+                # general collection as special and remove the prefix.
+                code = f'{col.code}/{page.code}'.replace('general/', '')
+                answer[code] = page
         return answer
 
     @property
@@ -95,7 +97,7 @@ class Site:
     def repo_url(self) -> str:
         return self.config.get('urls', {}).get('repo', '').rstrip('/')
 
-    @property
+    @cached_property
     def scopes(self) -> typing.Dict[str, Scope]:
         """Return all of the AIP scopes present in the site."""
         answer_list = []
@@ -129,24 +131,3 @@ class Site:
         for scope in sorted(answer_list, key=lambda i: i.order):
             answer[scope.code] = scope
         return answer
-
-    def _load_page(self, md_file: str) -> Page:
-        """Load a support page and return a new Page object."""
-        # Read the page file from disk.
-        with io.open(md_file, 'r') as f:
-            body = f.read()
-
-        # Check for a config file. If one exists, load it too.
-        config_file = re.sub(r'\.md(\.j2)?$', '.yaml', md_file)
-        config = {}
-        if os.path.exists(config_file):
-            with io.open(config_file, 'r') as f:
-                config = yaml.safe_load(f.read())
-
-        # Return the page.
-        return Page(
-            body=md.MarkdownDocument(body),
-            config=config,
-            repo_path=md_file[len(self.base_dir):],
-            site=self,
-        )
