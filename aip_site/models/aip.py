@@ -41,8 +41,11 @@ class AIP:
         # Hotlink AIP references.
         # We only hotlink the generally-applicable ones for now until we have
         # a prefix system implemented.
-        answer = re.sub(r'\b\[aip-([\d]{1,3})\]\b', r'(/\1)', answer)
-        answer = re.sub(r'\bAIP-([\d]{1,3})\b', r'[AIP-\1](/\1)', answer)
+        answer = re.sub(
+            r'\b(?<!\[)AIP-([\d]{1,3})\b',  # AIP-###, but not after a `[`.
+            r'[AIP-\1](/\1)',
+            answer,
+        )
 
         # Append the changelog if there is one.
         if self.changelog:

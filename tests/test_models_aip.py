@@ -30,7 +30,10 @@ def test_content(site):
 
     # Test hotlinking of AIP-###.
     hunchback = site.aips[31]
+    les_mis = site.aips[62]
     assert '[AIP-62](/62)' in hunchback.content
+    assert '[AIP-31](/31)' in les_mis.content
+    assert '[[AIP-31](/31)](/31)' not in les_mis.content
 
 
 def test_placement(site):
