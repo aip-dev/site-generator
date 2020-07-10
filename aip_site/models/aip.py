@@ -38,6 +38,14 @@ class AIP:
     def content(self) -> md.MarkdownDocument:
         answer = self.body
 
+        # TEMPORARY: In the interest of having two discrete migrations,
+        # rewrite the old link style to the new one.
+        answer = re.sub(
+            r'\.?\./0([\d]{1,3})\.md',
+            lambda m: f'/{int(m.groups()[0]):d}',
+            answer,
+        )
+
         # Hotlink AIP references.
         # We only hotlink the generally-applicable ones for now until we have
         # a prefix system implemented.
