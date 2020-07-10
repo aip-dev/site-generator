@@ -40,6 +40,7 @@ def test_relative_uri(site):
 
 def test_render(site):
     rendered = site.scopes['general'].render()
+    rendered_poetry = site.scopes['poetry'].render()
     assert '<h3 id="hugo">Victor Hugo</h3>' in rendered
     assert '<h3 id="dickens">Dickens</h3>' in rendered
-    assert '<h3 id="poetry">Shakespearean Poetry</h3>' in site.scopes['poetry'].render()
+    assert '<h3 id="poetry">Shakespearean Poetry</h3>' in rendered_poetry
