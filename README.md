@@ -4,9 +4,11 @@ Welcome to our NIH static site generator.
 
 ## Why?
 
+We are not fans of rolling our own tools when off-the-shelf alternatives exist.
+
 GitHub Pages normally automatically builds documentation with [Jekyll][], but
 as the AIP system has grown, we are beginning to reach the limits of what
-Jekyll can handle:
+Jekyll can handle, and other off-the-shelf generators had similar issues:
 
 - AIP adoption is handled through fork-and-merge and top-down configuration
   files will lead to repetitive merge conflicts.
