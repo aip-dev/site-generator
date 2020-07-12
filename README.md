@@ -27,12 +27,25 @@ There are some additional advantages that we unlock with a custom generator:
 
 ## Grumble. Fine. How does it work?
 
-The app is essentially split up into models (`generator/models.py`) and
-templates (`templates/`). The models file provides data classes that are sent
-to the templates and which have convenient accessors for template needs (title,
-relative URI, etc.)
+This is essentially split into three parts:
 
-There are three models that matter:
+- Python code (`aip_site/`):
+  - The majority of the code is models (`aip_site/models/`) that represent the
+    fundamental concept of an AIP site. These are rolled up into a singleton
+    object called `Site` that is used everywhere. All models are
+    [dataclasses][] that get sent to templates.
+  - There is also a publisher class (`aip_site/publisher.py`) that is able to
+    slurp up a repo of AIPs and build a static site.
+  - There is some server code (`aip_site/server.py`) that can run a development
+    server.
+  - All remaining files are thin support code to avoid repeating things in or
+    between the above.
+- Templates (`support/templates/`) are [Jinja2][] templates containing (mostly)
+  HTML that makes up the layout of the site.
+- Assets (`support/assets/` and `support/scss/`) are other static files. SCSS
+  is automatically compiled into CSS at publication.
+
+Of the models, there are three models in particular that matter:
 
 - **Site:** A singleton that provides access to all scopes, AIPs, and static
   pages. This is sent to every template as the `site` variable.
@@ -50,9 +63,15 @@ variable in a template is a hard error rather than an empty string.
 ### Entry points
 
 There are two entry points for the app. The _publisher_
-(`generator/publisher.py`) is the program that iterates over the relevant
+(`aip_site/publisher.py`) is the program that iterates over the relevant
 directories, renders HTML files, and writes them out to disk. The _app_
-(`app.py`) is a lightweight Flask app that provides a development server.
+(`aip_site/server.py`) is a lightweight Flask app that provides a development
+server.
 
+These entry points are routed through the CLI file (`aip_site/cli.py`); when
+this application is installed using pip, it makes the `aip-site-gen`
+(publisher) and `aip-site-serve` (server) commands available.
+
+[dataclasses]: https://docs.python.org/3/library/dataclasses.html
 [jekyll]: https://jekyllrb.com/
 [jinja2]: https://jinja.palletsprojects.com/en/2.11.x/
