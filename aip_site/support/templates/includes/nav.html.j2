@@ -4,9 +4,11 @@
     {# AIPs by Scope -#}
     <li class="nav-item nav-item-header">AIPs by Scope</li>
     {% for scope in site.scopes.values() -%}
+    {% if not scope.config.hidden | default('') -%}
     <li class="nav-item{% if path.endswith(scope.code) %} nav-item-active{% endif %}">
       <a href="{{ site.relative_uri }}/{{ scope.code }}">{{ scope.title }}</a>
     </li>
+    {% endif -%}
     {% endfor -%}
 
     {# Individual AIPs in this scope. -#}
