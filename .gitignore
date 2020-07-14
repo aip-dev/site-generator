@@ -1,0 +1,5 @@
+# Python tools
+.coverage
+.mypy_cache
+htmlcov
+*.egg-info

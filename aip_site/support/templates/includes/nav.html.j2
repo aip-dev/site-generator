@@ -1,0 +1,26 @@
+{% macro render_nav(site, path='/', scope_code='general') -%}
+<nav id="aip-nav" class="docs-component-nav">
+  <ul class="nav-list">
+    {# AIPs by Scope -#}
+    <li class="nav-item nav-item-header">AIPs by Scope</li>
+    {% for scope in site.scopes.values() -%}
+    {% if not scope.config.hidden | default('') -%}
+    <li class="nav-item{% if path.endswith(scope.code) %} nav-item-active{% endif %}">
+      <a href="{{ site.relative_uri }}/{{ scope.code }}">{{ scope.title }}</a>
+    </li>
+    {% endif -%}
+    {% endfor -%}
+
+    {# Individual AIPs in this scope. -#}
+    <li class="nav-item nav-item-header">AIPs</li>
+    {% for aip in site.scopes[scope_code].aips.values() -%}
+    <li class="nav-item{% if path.split('/')[-1] == '{:d}'.format(aip.id) %} nav-item-active{% endif %}">
+      <a href="{{ site.relative_uri }}/{{ aip.id }}">
+        <span class="aip-number">{{ aip.id }}</span>
+        {{ aip.title }}
+      </a>
+    </li>
+    {% endfor -%}
+  </ul>
+</nav>
+{% endmacro -%}
