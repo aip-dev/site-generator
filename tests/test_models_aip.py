@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import dataclasses
 from datetime import date
 
 from aip_site.models.aip import Change
@@ -28,12 +29,19 @@ def test_content(site):
     assert 'It was the best of times' in tale.content
     assert 'Changelog' not in tale.content
 
-    # Test hotlinking of AIP-###.
+
+def test_content_hotlinking(site):
     hunchback = site.aips[31]
     les_mis = site.aips[62]
     assert '[AIP-62](/62)' in hunchback.content
     assert '[AIP-31](/31)' in les_mis.content
     assert '[[AIP-31](/31)](/31)' not in les_mis.content
+
+
+def test_content_hotlinking_relative_uri(site):
+    site.config['urls']['site'] = 'https://github.io/aip'
+    hunchback = site.aips[31]
+    assert '[AIP-62](/aip/62)' in hunchback.content
 
 
 def test_placement(site):

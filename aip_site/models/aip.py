@@ -42,7 +42,7 @@ class AIP:
         # rewrite the old link style to the new one.
         answer = re.sub(
             r'\.?\./0([\d]{1,3})\.md',
-            lambda m: f'/{int(m.groups()[0]):d}',
+            lambda m: f'{self.site.relative_uri}/{int(m.groups()[0]):d}',
             answer,
         )
 
@@ -51,7 +51,7 @@ class AIP:
         # a prefix system implemented.
         answer = re.sub(
             r'\b(?<!\[)AIP-([\d]{1,3})\b',  # AIP-###, but not after a `[`.
-            r'[AIP-\1](/\1)',
+            fr'[AIP-\1]({self.site.relative_uri}/\1)',
             answer,
         )
 
