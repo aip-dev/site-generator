@@ -18,6 +18,8 @@ import datetime
 import re
 import typing
 
+import jinja2
+
 from aip_site import md
 from aip_site.env import jinja_env
 from aip_site.utils import cached_property
@@ -29,14 +31,18 @@ class AIP:
     state: str
     created: datetime.date
     scope: Scope
-    body: str
+    templates: typing.Dict[str, jinja2.Template]
     repo_path: str
     config: typing.Dict[str, typing.Any]
     changelog: typing.Set[Change] = dataclasses.field(default_factory=set)
 
     @cached_property
     def content(self) -> md.MarkdownDocument:
-        answer = self.body
+        # Render the content template into the actual content.
+        answer = next(iter(self.templates.values())).render(
+            aip=self,
+            site=self.site,
+        )
 
         # TEMPORARY: In the interest of having two discrete migrations,
         # rewrite the old link style to the new one.

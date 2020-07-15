@@ -17,8 +17,10 @@ import collections
 import dataclasses
 import io
 import os
+import re
 import typing
 
+import jinja2
 import yaml
 
 from aip_site.env import jinja_env
@@ -45,30 +47,93 @@ class Scope:
         # Similar to scopes, AIPs are detected based solely on
         # presence of file on disk.
         for fn in os.listdir(self.base_dir):
-            aip_file = os.path.join(self.base_dir, fn)
+            path = os.path.join(self.base_dir, fn)
+            templates = collections.OrderedDict()
 
-            # Sanity check: Does this look like an AIP?
-            if not fn.endswith('.md'):
+            # If this is an AIP directory, parse all the files inside it.
+            aip_config = os.path.join(path, 'aip.yaml')
+            if os.path.isdir(path) and os.path.exists(aip_config):
+                with io.open(aip_config, 'r') as f:
+                    meta = yaml.safe_load(f)
+
+                # We sort the files in the directory to read more specific
+                # files first.
+                for sfn in sorted(os.listdir(path),
+                        key=lambda p: len(p.rstrip('.j2').split('.')),
+                        reverse=True):
+                    # Sanity check: Is this an AIP content file?
+                    if not sfn.endswith(('.md', '.md.j2')):
+                        continue
+
+                    # Load the contents.
+                    with io.open(os.path.join(path, sfn)) as f:
+                        contents = f.read()
+
+                    # Transform the contents into a template if it is not
+                    # already.
+                    #
+                    # We do this by adding {% block %} tags corresponding to
+                    # Markdown headings.
+                    if not sfn.endswith('.j2'):
+                        # Make level-3 and level-2 headers into blocks,
+                        # in that order (to ensure the level-3 blocks are
+                        # snugly nested within the level-2 blocks).
+                        for token in ('\n### ', '\n## '):
+                            segments = contents.split(token)
+                            for ix, seg in enumerate(segments[1:], start=1):
+                                block_id = re.sub(
+                                    r'[^a-z]',
+                                    '_',
+                                    seg.split('\n',)[0].lower(),
+                                ).replace('__', '_').strip('_')
+                                segments[ix] = '\n'.join((
+                                    f'{{% block {block_id} %}}',
+                                    f'{token.strip()} {seg}',
+                                    f'{{% endblock %}} {{# {block_id} #}}\n',
+                                ))
+                            contents = '\n'.join(segments)
+
+                    # Get the view from the filename.
+                    while sfn.endswith(('.md', '.j2')):
+                        sfn = sfn[:-3]
+                    try:
+                        view = sfn.split('.')[1:][0]
+                    except IndexError:
+                        view = 'generic'
+
+                    # Create a template object for the contents.
+                    contents_tmpl = jinja2.Template(contents,
+                        undefined=jinja2.StrictUndefined,
+                    )
+
+                    # Add the template to the set of templates.
+                    templates[view] = contents_tmpl
+
+            # Sanity check: Does this look like an old-style AIP?
+            elif fn.endswith('.md'):
+                # Load the AIP.
+                with io.open(path, 'r') as f:
+                    contents = f.read()
+
+                # Parse out the front matter from the Markdown content.
+                fm, body = contents.lstrip('-\n').split('---\n', maxsplit=1)
+                templates['generic'] = jinja2.Template(body)
+                meta = yaml.safe_load(fm)
+
+            # This is not a recognized AIP.
+            else:
                 continue
-
-            # Load the AIP.
-            with io.open(aip_file, 'r') as f:
-                contents = f.read()
-
-            # Parse out the front matter from the Markdown content.
-            fm, body = contents.lstrip('-\n').split('---\n', maxsplit=1)
-            meta = yaml.safe_load(fm)
 
             # Create the AIP object.
             answer.append(AIP(
                 id=meta.pop('id'),
-                body=body,
                 config=meta,
                 changelog={Change(**i) for i in meta.pop('changelog', [])},
                 created=meta.pop('created'),
-                repo_path=aip_file[len(self.site.base_dir):],
+                repo_path=path[len(self.site.base_dir):],
                 scope=self,
                 state=meta.pop('state'),
+                templates=templates,
             ))
 
         answer = sorted(answer, key=lambda i: i.id)
