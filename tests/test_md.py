@@ -48,6 +48,27 @@ def markdown_doc():
     """).strip())
 
 
+def test_blocked_content(markdown_doc):
+    blocked = markdown_doc.blocked_content
+    blocks = ('sub_1', 'drilling_down', 'still_drilling', 'sub_2')
+    for ix, block in enumerate(blocks):
+        assert f'{{% block {block} %}}' in blocked
+        assert f'{{% endblock %}} {{# {block} #}}' in blocked
+
+    # Also ensure that the blocks both open and close in the correct order.
+    now_or_later = (
+        ('{% block sub_1 %}', '{% block drilling_down %}'),
+        ('{% block sub_1 %}', '{% block still_drilling %}'),
+        ('{% block sub_1 %}', '{% block sub_2 %}'),
+        ('{% endblock %} {# drilling_down #}', '{% block still_drilling %}'),
+        ('{% endblock %} {# drilling_down #}', '{% endblock %} {# sub_1 #}'),
+        ('{% endblock %} {# still_drilling #}', '{% endblock %} {# sub_1 #}'),
+        ('{% endblock %} {# sub_1 #}', '{% endblock %} {# sub_2 #}'),
+    )
+    for now, later in now_or_later:
+        assert blocked.index(now) < blocked.index(later)
+
+
 def test_coerce(markdown_doc):
     assert '# Title' in markdown_doc
     assert '# Title' in str(markdown_doc)
