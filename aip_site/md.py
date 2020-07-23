@@ -18,6 +18,8 @@ import markdown              # type: ignore
 import pymdownx.highlight    # type: ignore
 import pymdownx.superfences  # type: ignore
 
+from aip_site.utils import cached_property
+
 
 class MarkdownDocument(str):
     """A utility class representing Markdown content."""
@@ -38,7 +40,7 @@ class MarkdownDocument(str):
     def __str__(self) -> str:
         return self._content
 
-    @property
+    @cached_property
     def blocked_content(self) -> str:
         """Return a Markdown document with Jinja blocks added per-section."""
         answer = str(self)
@@ -65,14 +67,12 @@ class MarkdownDocument(str):
         # Done; return the answer.
         return answer
 
-    @property
+    @cached_property
     def html(self) -> str:
         """Return the HTML content for this Markdown document."""
-        if not hasattr(self, '_html'):
-            self._html = self._engine.convert(self._content)
-        return self._html
+        return self._engine.convert(self._content)
 
-    @property
+    @cached_property
     def title(self) -> str:
         """Return the document title."""
         return self._content.strip().splitlines()[0].strip('# \n')
