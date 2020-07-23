@@ -17,13 +17,13 @@ import collections
 import dataclasses
 import io
 import os
-import re
 import typing
 
 import jinja2
 import yaml
 
 from aip_site.env import jinja_env
+from aip_site.md import MarkdownDocument
 from aip_site.models.aip import AIP
 from aip_site.models.aip import Change
 from aip_site.utils import cached_property
@@ -75,23 +75,9 @@ class Scope:
                     # We do this by adding {% block %} tags corresponding to
                     # Markdown headings.
                     if not sfn.endswith('.j2'):
-                        # Make level-3 and level-2 headers into blocks,
-                        # in that order (to ensure the level-3 blocks are
-                        # snugly nested within the level-2 blocks).
-                        for token in ('\n### ', '\n## '):
-                            segments = contents.split(token)
-                            for ix, seg in enumerate(segments[1:], start=1):
-                                block_id = re.sub(
-                                    r'[^a-z]',
-                                    '_',
-                                    seg.split('\n',)[0].lower(),
-                                ).replace('__', '_').strip('_')
-                                segments[ix] = '\n'.join((
-                                    f'{{% block {block_id} %}}',
-                                    f'{token.strip()} {seg}',
-                                    f'{{% endblock %}} {{# {block_id} #}}\n',
-                                ))
-                            contents = '\n'.join(segments)
+                        # Iterate over the individual components in the table
+                        # of contents and make each into a block.
+                        contents = MarkdownDocument(contents).blocked_content
 
                     # Get the view from the filename.
                     while sfn.endswith(('.md', '.j2')):
