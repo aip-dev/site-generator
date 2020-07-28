@@ -6,8 +6,8 @@ AIP-{{ aip.id }}: {{ aip.title }}
 
 {% block js %}
 <script type="text/javascript" src="{{ site.relative_uri }}/assets/js/proto-syntax.js"></script>
-{% if aip.js_scripts is defined -%}
-{% for js_script in aip.js_scripts -%}
+{% if 'js_scripts' in aip.config -%}
+{% for js_script in aip.config.js_scripts -%}
 <script type="text/javascript" src="{{ site.relative_uri }}{{ js_script }}?v={{ site.revision }}"></script>
 {% endfor -%}
 {% endif -%}
