@@ -23,7 +23,7 @@ class MarkdownDocument(str):
     def __init__(self, content: str, *, toc_title: str = 'Contents'):
         self._content = content
         self._engine = markdown.Markdown(
-            extensions=[_superfences, 'tables', 'toc'],
+            extensions=[_superfences, 'tables', 'toc', 'pymdownx.tabbed'],
             extension_configs={
                 'toc': {
                     'title': toc_title,
