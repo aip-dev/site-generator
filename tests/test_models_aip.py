@@ -77,6 +77,17 @@ def test_updated(site):
     assert site.aips[43].updated == date(1844, 12, 25)
 
 
+def test_views(site):
+    les_mis = site.aips[62]
+    kw = {'aip': les_mis, 'site': site}
+    assert 'Quoique ce' in les_mis.templates['generic'].render(**kw)
+    assert 'Quoique ce' not in les_mis.templates['en'].render(**kw)
+    assert 'Although' not in les_mis.templates['generic'].render(**kw)
+    assert 'Although' in les_mis.templates['en'].render(**kw)
+    assert 'Myriel was Bishop' in les_mis.templates['generic'].render(**kw)
+    assert 'Myriel was Bishop' in les_mis.templates['en'].render(**kw)
+
+
 def test_render(site):
     rendered = site.aips[43].render()
     assert '<h1>A Christmas Carol</h1>' in rendered

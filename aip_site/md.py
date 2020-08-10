@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
+
 import markdown              # type: ignore
 import pymdownx.highlight    # type: ignore
 import pymdownx.superfences  # type: ignore
+
+from aip_site.utils import cached_property
 
 
 class MarkdownDocument(str):
@@ -36,14 +40,39 @@ class MarkdownDocument(str):
     def __str__(self) -> str:
         return self._content
 
-    @property
+    @cached_property
+    def blocked_content(self) -> str:
+        """Return a Markdown document with Jinja blocks added per-section."""
+        answer = str(self)
+
+        # We need to fire the html property because conversion may not have
+        # happened yet, and the toc extension requires conversion to occur
+        # first.
+        #
+        # The `html` property caches, so this does not entail any additional
+        # performance hit.
+        self.html
+
+        # We use the Markdown toc plugin to separate the headers and identify
+        # where to put the blocks. Iterate over each toc_token and encapsulate
+        # it in a block.
+        toc_tokens = self._engine.toc_tokens
+        for ix, token in enumerate(toc_tokens):
+            try:
+                next_token = toc_tokens[ix + 1]
+            except IndexError:
+                next_token = None
+            answer = _add_block(answer, token, next_token)
+
+        # Done; return the answer.
+        return answer
+
+    @cached_property
     def html(self) -> str:
         """Return the HTML content for this Markdown document."""
-        if not hasattr(self, '_html'):
-            self._html = self._engine.convert(self._content)
-        return self._html
+        return self._engine.convert(self._content)
 
-    @property
+    @cached_property
     def title(self) -> str:
         """Return the document title."""
         return self._content.strip().splitlines()[0].strip('# \n')
@@ -59,6 +88,50 @@ class MarkdownDocument(str):
         # performance hit.
         self.html
         return self._engine.toc
+
+
+def _add_block(content: str, toc_token, next_toc_token=None) -> str:
+    # Determine the beginning of the block.
+    heading = '#' * toc_token['level'] + r'\s+' + toc_token['name']
+    match = re.search(heading, content)
+    if not match:
+        return content
+    start_ix = match.span()[0]
+
+    # Determine the end of the block.
+    end_ix = len(content)
+    if next_toc_token:
+        end_h = '#' * next_toc_token['level'] + r'\s+' + next_toc_token['name']
+        match = re.search(end_h, content)
+        if not match:
+            return content
+        end_ix = match.span()[0]
+    elif '{% endblock %}' in content[start_ix:]:
+        # We can match against an {% endblock %} safely because we are
+        # processing "top-down" (e.g. <h2> before <h3>), then beginning-to-end;
+        # this means that encountering an {% endblock %} is guaranteed to be
+        # the endblock for the enclosing block.
+        end_ix = content.index('{% endblock %}', start_ix)
+
+    # Add the block for this heading.
+    block = content[start_ix:end_ix]
+    block_id = toc_token['id'].replace('-', '_')
+    content = content.replace(block, '\n'.join((
+        f'{{% block {block_id} %}}',
+        block,
+        f'{{% endblock %}} {{# {block_id} #}}',
+    )), 1)
+
+    # Iterate over any children to this toc_token and process them.
+    for ix, child in enumerate(toc_token['children']):
+        try:
+            next_child = toc_token['children'][ix + 1]
+        except IndexError:
+            next_child = None
+        content = _add_block(content, child, next_toc_token=next_child)
+
+    # Done; return the content with blocks.
+    return content
 
 
 def _fmt(src: str, lang: str, css_class: str, *args, **kwargs):

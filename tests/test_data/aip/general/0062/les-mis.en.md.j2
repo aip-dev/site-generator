@@ -1,19 +1,7 @@
----
-id: 62
-state: approved
-created: 1862-04-21
-placement:
-  category: hugo
-  order: 20
----
+{% extends aip.templates.generic %}
 
-# Les Misérables
-
-In 1815, M. Charles-François-Bienvenu Myriel was Bishop of Digne He was an old
-man of about seventy-five years of age; he had occupied the see of Digne
-since 1806.
-
-## Guidance
+{% block bp_myriel %}
+## Bishop Myriel
 
 Although this detail has no connection whatever with the real substance of what
 we are about to relate, it will not be superfluous, if merely for the sake of
@@ -29,7 +17,4 @@ parliamentary families. In spite of this marriage, however, it was said that
 Charles Myriel created a great deal of talk. He was well formed, though rather
 short in stature, elegant, graceful, intelligent; the whole of the first
 portion of his life had been devoted to the world and to gallantry.
-
-## Further reading
-
-- For more from Victor Hugo, read [AIP-31](/31).
+{% endblock %}

@@ -74,6 +74,42 @@ These entry points are routed through the CLI file (`aip_site/cli.py`); when
 this application is installed using pip, it makes the `aip-site-gen`
 (publisher) and `aip-site-serve` (server) commands available.
 
+### Extensions
+
+This site generator includes a basic extension system for AIPs. When processing
+AIPs as plain Markdown files, it will make any Markdown (level 2 or 3) header
+into a block. Therefore...
+
+```md
+## Foo bar baz
+
+Lorem ipsum dolor set amet
+```
+
+Becomes...
+
+```j2
+{% block foo_bar_baz %}
+## Foo bar baz
+
+Lorem ipsum dolor set amet
+{% endblock %}
+```
+
+That allows an overriding template to extend the original one and override
+sections:
+
+```j2
+{% extends aip.templates.generic %}
+
+{% block foo_bar_baz %}
+
+## My mo-betta foo bar baz
+
+Lorem ipsum dolor set something-not-amet
+{% endblock %}
+```
+
 [dataclasses]: https://docs.python.org/3/library/dataclasses.html
 [jekyll]: https://jekyllrb.com/
 [jinja2]: https://jinja.palletsprojects.com/en/2.11.x/
