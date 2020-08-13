@@ -1,0 +1,48 @@
+@import 'imports/colors';
+
+.tabbed-set {
+  display: flex;
+  position: relative;
+  flex-wrap: wrap;
+
+  .tabbed-content {
+    display: none;
+    order: 99;
+    width: 100%;
+  }
+
+  label {
+    border-radius: 10px 10px 0px 0px;
+    color: $glue-grey-600;
+    cursor: pointer;
+    font-family: 'Google Sans', 'Roboto', Arial, Helvetica, sans-serif;
+    font-size: 80%;
+    font-weight: 500;
+    margin: 0 0.5em;
+    padding: 1.25em;
+    width: auto;
+  }
+
+  input {
+    position: absolute;
+    opacity: 0;
+
+    &:nth-child(n + 1) {
+      color: $glue-grey-900;
+    }
+
+    &:checked + label {
+      background-color: $glue-grey-100;
+      border-bottom: 2px solid $glue-blue-700;
+      color: $glue-grey-900;
+      z-index: 1;
+
+      + .tabbed-content {
+        border-top: 2px solid $glue-grey-100;
+        display: block;
+        margin-top: -2px;
+        padding-top: 1em;
+      }
+    }
+  }
+}
