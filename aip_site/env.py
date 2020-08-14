@@ -15,6 +15,8 @@
 import os
 
 import jinja2
+import jinja2.ext
+import jinja2.nodes
 
 from aip_site import md
 
@@ -24,7 +26,62 @@ TEMPLATE_DIR = os.path.realpath(
 )
 
 
+class TabExtension(jinja2.ext.Extension):
+    tags = {'tab'}
+
+    def parse(self, parser):
+        answer = []
+
+        # The first token is the token that started the tag, which is always
+        # "tab" because that is the only token we watch.
+        lineno = next(parser.stream).lineno
+
+        # Get the language for this tab.
+        lang = parser.stream.expect('name')
+        lang_title = {
+            'oas': 'OpenAPI 3.0',
+            'proto': 'Protocol buffers',
+        }.get(lang.value, lang.value.capitalize())
+
+        # Encase the tab's content in a Markdown tab, properly indented.
+        # WRONG NODE: Need to determine the right one.
+        tab_title = jinja2.nodes.TemplateData(f'=== "{lang_title}"\n\n')
+        body = parser.parse_statements(['name:endtabs', 'name:tab'])
+        indented_body = jinja2.nodes.FilterBlock(
+            body,
+            jinja2.nodes.Filter(
+                None, 'indent', (), [
+                    jinja2.nodes.Keyword('width', jinja2.nodes.Const(2)),
+                    jinja2.nodes.Keyword('first', jinja2.nodes.Const(True)),
+                ], None, None,
+            ),
+        ).set_lineno(lineno)
+        answer = [tab_title, indented_body]
+
+        # If there is another tab, parse it too.
+        if parser.stream.current.value == 'tab':
+            answer += self.parse(parser)
+        else:
+            next(parser.stream)  # Drop endtabs.
+
+        # Done; return the content.
+        return answer
+
+
+class SampleExtension(jinja2.ext.Extension):
+    tags = {'sample'}
+
+    def parse(self, parser):
+        lineno = next(parser.stream).lineno
+        args = parser.parse_tuple()
+        return jinja2.nodes.Const('\n')
+
+
 jinja_env = jinja2.Environment(
+    extensions=[
+        # SampleExtension,
+        TabExtension,
+    ],
     loader=jinja2.FileSystemLoader(searchpath=TEMPLATE_DIR),
     undefined=jinja2.StrictUndefined,
 )

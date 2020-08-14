@@ -89,6 +89,7 @@ class Scope:
 
                     # Create a template object for the contents.
                     contents_tmpl = jinja2.Template(contents,
+                        extensions=jinja_env.extensions,
                         undefined=jinja2.StrictUndefined,
                     )
 
