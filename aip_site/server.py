@@ -81,4 +81,9 @@ def site_load_func(src: str):
     """
     def fx():
         flask.g.site = Site.load(src)
+
+        # This is the dev server, so plow over whatever the configuration
+        # says that the site URL is.
+        flask.g.site.config.setdefault('urls', {})
+        flask.g.site.config['urls']['site'] = 'http://localhost:4000'
     return fx
