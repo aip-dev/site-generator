@@ -42,8 +42,9 @@ class TabExtension(jinja2.ext.Extension):
         }.get(lang.value, lang.value.capitalize())
 
         # Encase the tab's content in a Markdown tab, properly indented.
-        # WRONG NODE: Need to determine the right one.
-        tab_title = jinja2.nodes.TemplateData(f'=== "{lang_title}"\n\n')
+        tab_title = jinja2.nodes.Output(
+            [jinja2.nodes.TemplateData(f'=== "{lang_title}"\n\n')],
+        )
         body = parser.parse_statements(['name:endtabs', 'name:tab'])
         indented_body = jinja2.nodes.FilterBlock(
             body,
