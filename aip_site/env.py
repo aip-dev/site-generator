@@ -29,9 +29,7 @@ TEMPLATE_DIR = os.path.realpath(
 class TabExtension(jinja2.ext.Extension):
     tags = {'tab'}
 
-    def parse(self, parser):
-        answer = []
-
+    def parse(self, parser, cursor=()):
         # The first token is the token that started the tag, which is always
         # "tab" because that is the only token we watch.
         lineno = next(parser.stream).lineno
@@ -56,16 +54,16 @@ class TabExtension(jinja2.ext.Extension):
                 ], None, None,
             ),
         ).set_lineno(lineno)
-        answer = [tab_title, indented_body]
+        cursor += (tab_title, indented_body)
 
         # If there is another tab, parse it too.
         if parser.stream.current.value == 'tab':
-            answer += self.parse(parser)
+            return self.parse(parser, cursor=cursor)
         else:
             next(parser.stream)  # Drop endtabs.
 
         # Done; return the content.
-        return answer
+        return list(cursor)
 
 
 class SampleExtension(jinja2.ext.Extension):
