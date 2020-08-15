@@ -12,18 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-
-import jinja2
 import jinja2.ext
 import jinja2.nodes
-
-from aip_site import md
-
-
-TEMPLATE_DIR = os.path.realpath(
-    os.path.join(os.path.dirname(__file__), 'support', 'templates'),
-)
 
 
 class TabExtension(jinja2.ext.Extension):
@@ -65,23 +55,3 @@ class TabExtension(jinja2.ext.Extension):
 
         # Done; return the content.
         return list(cursor)
-
-
-class SampleExtension(jinja2.ext.Extension):
-    tags = {'sample'}
-
-    def parse(self, parser):
-        lineno = next(parser.stream).lineno
-        args = parser.parse_tuple()
-        return jinja2.nodes.Const('\n')
-
-
-jinja_env = jinja2.Environment(
-    extensions=[
-        # SampleExtension,
-        TabExtension,
-    ],
-    loader=jinja2.FileSystemLoader(searchpath=TEMPLATE_DIR),
-    undefined=jinja2.StrictUndefined,
-)
-jinja_env.filters['markdown'] = lambda s: md.MarkdownDocument(s).html

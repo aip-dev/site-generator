@@ -22,7 +22,7 @@ import typing
 import jinja2
 import yaml
 
-from aip_site.env import jinja_env
+from aip_site.jinja.env import jinja_env
 from aip_site.md import MarkdownDocument
 from aip_site.models.aip import AIP
 from aip_site.models.aip import Change
@@ -92,6 +92,7 @@ class Scope:
                         extensions=jinja_env.extensions,
                         undefined=jinja2.StrictUndefined,
                     )
+                    contents_tmpl.filename = path
 
                     # Add the template to the set of templates.
                     templates[view] = contents_tmpl
@@ -117,7 +118,7 @@ class Scope:
                 config=meta,
                 changelog={Change(**i) for i in meta.pop('changelog', [])},
                 created=meta.pop('created'),
-                repo_path=path[len(self.site.base_dir):],
+                path=path,
                 scope=self,
                 state=meta.pop('state'),
                 templates=templates,

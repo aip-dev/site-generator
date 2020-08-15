@@ -21,7 +21,7 @@ import typing
 import jinja2
 
 from aip_site import md
-from aip_site.env import jinja_env
+from aip_site.jinja.env import jinja_env
 from aip_site.utils import cached_property
 
 
@@ -32,7 +32,7 @@ class AIP:
     created: datetime.date
     scope: Scope
     templates: typing.Dict[str, jinja2.Template]
-    repo_path: str
+    path: str
     config: typing.Dict[str, typing.Any]
     changelog: typing.Set[Change] = dataclasses.field(default_factory=set)
 
@@ -91,6 +91,11 @@ class AIP:
         if self.scope.code != 'general':
             return f'/{self.scope.code}/{self.id}'
         return f'/{self.id}'
+
+    @property
+    def repo_path(self) -> str:
+        """Return the relative repository path."""
+        return self.path[len(self.site.base_dir):]
 
     @property
     def site(self) -> Site:
