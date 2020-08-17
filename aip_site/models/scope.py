@@ -19,11 +19,9 @@ import io
 import os
 import typing
 
-import jinja2
 import yaml
 
 from aip_site.jinja.env import jinja_env
-from aip_site.md import MarkdownDocument
 from aip_site.models.aip import AIP
 from aip_site.models.aip import Change
 from aip_site.utils import cached_property
@@ -48,54 +46,10 @@ class Scope:
         # presence of file on disk.
         for fn in os.listdir(self.base_dir):
             path = os.path.join(self.base_dir, fn)
-            templates = collections.OrderedDict()
-
-            # If this is an AIP directory, parse all the files inside it.
             aip_config = os.path.join(path, 'aip.yaml')
             if os.path.isdir(path) and os.path.exists(aip_config):
                 with io.open(aip_config, 'r') as f:
                     meta = yaml.safe_load(f)
-
-                # We sort the files in the directory to read more specific
-                # files first.
-                for sfn in sorted(os.listdir(path),
-                        key=lambda p: len(p.rstrip('.j2').split('.')),
-                        reverse=True):
-                    # Sanity check: Is this an AIP content file?
-                    if not sfn.endswith(('.md', '.md.j2')):
-                        continue
-
-                    # Load the contents.
-                    with io.open(os.path.join(path, sfn)) as f:
-                        contents = f.read()
-
-                    # Transform the contents into a template if it is not
-                    # already.
-                    #
-                    # We do this by adding {% block %} tags corresponding to
-                    # Markdown headings.
-                    if not sfn.endswith('.j2'):
-                        # Iterate over the individual components in the table
-                        # of contents and make each into a block.
-                        contents = MarkdownDocument(contents).blocked_content
-
-                    # Get the view from the filename.
-                    while sfn.endswith(('.md', '.j2')):
-                        sfn = sfn[:-3]
-                    try:
-                        view = sfn.split('.')[1:][0]
-                    except IndexError:
-                        view = 'generic'
-
-                    # Create a template object for the contents.
-                    contents_tmpl = jinja2.Template(contents,
-                        extensions=jinja_env.extensions,
-                        undefined=jinja2.StrictUndefined,
-                    )
-                    contents_tmpl.filename = path
-
-                    # Add the template to the set of templates.
-                    templates[view] = contents_tmpl
 
             # Sanity check: Does this look like an old-style AIP?
             elif fn.endswith('.md'):
@@ -105,7 +59,6 @@ class Scope:
 
                 # Parse out the front matter from the Markdown content.
                 fm, body = contents.lstrip('-\n').split('---\n', maxsplit=1)
-                templates['generic'] = jinja2.Template(body)
                 meta = yaml.safe_load(fm)
 
             # This is not a recognized AIP.
@@ -121,7 +74,6 @@ class Scope:
                 path=path,
                 scope=self,
                 state=meta.pop('state'),
-                templates=templates,
             ))
 
         answer = sorted(answer, key=lambda i: i.id)

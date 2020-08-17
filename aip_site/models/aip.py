@@ -13,8 +13,10 @@
 # limitations under the License.
 
 from __future__ import annotations
+import collections
 import dataclasses
 import datetime
+import io
 import re
 import typing
 
@@ -22,6 +24,8 @@ import jinja2
 
 from aip_site import md
 from aip_site.jinja.env import jinja_env
+from aip_site.jinja.ext.tab import TabExtension
+from aip_site.jinja.loaders import AIPLoader
 from aip_site.utils import cached_property
 
 
@@ -31,7 +35,6 @@ class AIP:
     state: str
     created: datetime.date
     scope: Scope
-    templates: typing.Dict[str, jinja2.Template]
     path: str
     config: typing.Dict[str, typing.Any]
     changelog: typing.Set[Change] = dataclasses.field(default_factory=set)
@@ -70,6 +73,15 @@ class AIP:
         # Return the document.
         return md.MarkdownDocument(answer)
 
+    @cached_property
+    def env(self) -> jinja2.Environment:
+        return jinja2.Environment(
+            extensions=[
+                TabExtension,
+            ],
+            loader=AIPLoader(self),
+        )
+
     @property
     def placement(self) -> Placement:
         """Return the placement data for this AIP, or sensible defaults."""
@@ -102,7 +114,26 @@ class AIP:
         """Return the site for this AIP."""
         return self.scope.site
 
-    @property
+    @cached_property
+    def templates(self) -> typing.Dict[str, jinja2.Template]:
+        """Load and return the templates for this AIP."""
+        # Sanity check: Is this a legacy AIP (in the old Jekyll format)?
+        # If so, process out a single template and return it.
+        if self._legacy:
+            with io.open(self.path, 'r') as f:
+                contents = f.read()
+            _, body = contents.lstrip('-\n').split('---\n', maxsplit=1)
+            return {'generic': jinja2.Template(body)}
+
+        # Return a dictionary with all of the templates.
+        #
+        # Note: This could be made more efficient in the future by only loading
+        # the template that the user wants.
+        return collections.OrderedDict([
+            (k, self.env.get_template(k)) for k in self.env.list_templates()
+        ])
+
+    @cached_property
     def title(self) -> str:
         """Return the AIP title."""
         return self.content.title
@@ -116,6 +147,11 @@ class AIP:
         if self.changelog:
             return sorted(self.changelog)[0].date
         return self.created
+
+    @property
+    def _legacy(self) -> bool:
+        """Return True if this is a legacy AIP, False otherwise."""
+        return self.path.endswith('.md')
 
     def render(self):
         """Return the fully-rendered page for this AIP."""

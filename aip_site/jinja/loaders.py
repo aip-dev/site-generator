@@ -22,11 +22,14 @@ import jinja2.loaders
 
 from aip_site.md import MarkdownDocument
 
+if typing.TYPE_CHECKING:
+    from aip_site.models.aip import AIP
+
 
 class AIPLoader(jinja2.loaders.BaseLoader):
     """Loader for loading AIPs."""
 
-    def __init__(self, aip: AIP):
+    def __init__(self, aip: 'AIP'):
         super().__init__()
         self.aip = aip
 
@@ -54,7 +57,7 @@ class AIPLoader(jinja2.loaders.BaseLoader):
             fn += '.j2'
 
         # Load the contents.
-        with io.open(os.path.join(self.aip.path, fn)) as f:
+        with io.open(fn) as f:
             contents = f.read()
 
         # Transform the contents into a template if it is not
@@ -89,7 +92,3 @@ class AIPLoader(jinja2.loaders.BaseLoader):
         # There is always a generic view.
         answer.append('generic')
         return answer
-
-
-if typing.TYPE_CHECKING:
-    from aip_site.models.aip import AIP
