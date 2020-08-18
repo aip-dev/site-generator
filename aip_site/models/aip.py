@@ -24,6 +24,7 @@ import jinja2
 
 from aip_site import md
 from aip_site.jinja.env import jinja_env
+from aip_site.jinja.ext.sample import SampleExtension
 from aip_site.jinja.ext.tab import TabExtension
 from aip_site.jinja.loaders import AIPLoader
 from aip_site.utils import cached_property
@@ -77,6 +78,7 @@ class AIP:
     def env(self) -> jinja2.Environment:
         return jinja2.Environment(
             extensions=[
+                SampleExtension,
                 TabExtension,
             ],
             loader=AIPLoader(self),

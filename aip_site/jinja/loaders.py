@@ -71,7 +71,7 @@ class AIPLoader(jinja2.loaders.BaseLoader):
             contents = MarkdownDocument(contents).blocked_content
 
         # Return the template information.
-        return contents, self.aip.path, None
+        return contents, fn, None
 
     def list_templates(self) -> typing.Sequence[str]:
         answer = []
