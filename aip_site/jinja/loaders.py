@@ -35,15 +35,16 @@ class AIPLoader(jinja2.loaders.BaseLoader):
 
     def get_source(self, env, template: str) -> typing.Tuple[str, str, None]:
         # Find the appropriate AIP file.
-        view = template.split('.')
-        while view:
-            view_str = '.'.join(view)
-            fn = os.path.join(self.aip.path, f'aip.{view_str}.md')
-            if os.path.isfile(fn) or os.path.isfile(f'{fn}.j2'):
-                break
-            view = view[1:]
-        else:
+        if template == 'generic':
             fn = os.path.join(self.aip.path, 'aip.md')
+        else:
+            view = template.split('.')
+            while view:
+                view_str = '.'.join(view)
+                fn = os.path.join(self.aip.path, f'aip.{view_str}.md')
+                if os.path.isfile(fn) or os.path.isfile(f'{fn}.j2'):
+                    break
+                view = view[1:]
 
         # Sanity check: Does the file exist?
         # If not, raise an error.
