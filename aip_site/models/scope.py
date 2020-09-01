@@ -52,7 +52,7 @@ class Scope:
                     meta = yaml.safe_load(f)
 
             # Sanity check: Does this look like an old-style AIP?
-            elif fn.endswith('.md'):
+            elif path.endswith('.md'):
                 # Load the AIP.
                 with io.open(path, 'r') as f:
                     contents = f.read()
@@ -63,6 +63,7 @@ class Scope:
 
             # This is not a recognized AIP.
             else:
+                meta = None  # Not needed; fixes a coverage bug.
                 continue
 
             # Create the AIP object.

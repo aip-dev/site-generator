@@ -60,12 +60,12 @@ class AIPLoader(jinja2.loaders.BaseLoader):
         with io.open(fn) as f:
             contents = f.read()
 
-        # Transform the contents into a template if it is not
-        # already.
+        # Add custom {% block %} tags corresponding to Markdown headings.
         #
-        # We do this by adding {% block %} tags corresponding to
-        # Markdown headings.
-        if not fn.endswith('.j2'):
+        # Note: We only do this if the template does not already have
+        # {% block %} tags to avoid either stomping over input, or creating
+        # an invalid template.
+        if not re.search(r'\{%-? block', contents):
             # Iterate over the individual components in the table
             # of contents and make each into a block.
             contents = MarkdownDocument(contents).blocked_content
