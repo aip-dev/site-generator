@@ -36,19 +36,18 @@ class SampleExtension(jinja2.ext.Extension):
         parser.stream.expect('comma')
         symbol = parser.stream.expect('string').value
 
-        # Sanity check: Does the file exist?
+        # Load the sample file.
         aip = self.environment.loader.aip
         filename = os.path.join(aip.path, fn)
-        if not os.path.isfile(filename):
+        try:
+            with io.open(filename, 'r') as f:
+                code = f.read()
+        except FileNotFoundError:
             raise jinja2.TemplateSyntaxError(
                 filename=parser.filename,
                 lineno=lineno,
                 message='File not found: %s' % filename,
             )
-
-        # Load the file.
-        with io.open(filename, 'r') as f:
-            code = f.read()
 
         # Tease out the desired symbol.
         match = re.search(rf'^([\s]*)({symbol})', code, flags=re.MULTILINE)
