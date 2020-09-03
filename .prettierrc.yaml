@@ -1,8 +1,5 @@
 ---
 overrides:
-  - files: '*.html.j2'
-    options:
-      parser: html
   - files: '*.md.j2'
     options:
       parser: markdown
