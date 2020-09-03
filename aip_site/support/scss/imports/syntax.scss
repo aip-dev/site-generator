@@ -82,7 +82,9 @@ code,
   }
 
   // Name: Key (.nk)
-  .nk {
+  // Name: Other (.nx)
+  .nk,
+  .nx {
     color: #6a1b9a;
   }
 
@@ -128,6 +130,11 @@ code,
   // Operator: Word
   .ow {
     @extend .k;
+  }
+
+  // Punctuation: Semicolons
+  .p.semi {
+    color: $glue-grey-400;
   }
 
   // --------
