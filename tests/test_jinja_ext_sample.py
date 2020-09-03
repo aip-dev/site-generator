@@ -41,6 +41,7 @@ def test_valid_sample_nested_braces(site):
             {% sample 'les_mis.proto', 'message Book' %}
         """)
     content = textwrap.dedent("""
+        // A representation for a book.
         message Book {
             string name = 1;
             enum Type {
@@ -53,10 +54,11 @@ def test_valid_sample_nested_braces(site):
         message Other {
             string whatever = 1;
         }
-    """)
+    """.lstrip())
     with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
         rendered = les_mis.env.get_template('test').render(aip=les_mis)
     assert '```proto\n' in rendered
+    assert '// A representation for a book.\n' in rendered
     assert 'message Book {\n' in rendered
     assert '    string name = 1;\n' in rendered
     assert '    enum Type {\n' in rendered
@@ -64,6 +66,30 @@ def test_valid_sample_nested_braces(site):
     assert '    Type type = 2;\n' in rendered
     assert 'message Other' not in rendered
     assert 'string whatever' not in rendered
+
+
+def test_valid_sample_semi(site):
+    with mock.patch.object(loaders, 'AIPLoader', TestLoader):
+        les_mis = site.aips[62]
+        les_mis.env.loader.set_template_body(r"""
+            {% sample 'les_mis.proto', 'string name' %}
+        """)
+    content = textwrap.dedent("""
+        // A representation of a book.
+        message Book {
+            // The name of the book.
+            // Format: publishers/{publisher}/books/{book}
+            string name = 1;
+        }
+    """)
+    with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
+        rendered = les_mis.env.get_template('test').render(aip=les_mis)
+    assert '```proto\n' in rendered
+    assert '// The name of the book.' in rendered
+    assert 'string name = 1;\n' in rendered
+    assert '  string name = 1;\n' not in rendered
+    assert '// A representation of a book.\n' not in rendered
+    assert 'message Book {\n' not in rendered
 
 
 def test_valid_sample_yaml(site):
@@ -76,6 +102,7 @@ def test_valid_sample_yaml(site):
         ---
         schemas:
             meh: meh
+        # The paths.
         paths:
             foo: bar
             baz: bacon
@@ -84,6 +111,7 @@ def test_valid_sample_yaml(site):
     with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
         rendered = les_mis.env.get_template('test').render(aip=les_mis)
     assert '```yaml\n' in rendered
+    assert '# The paths.\n' in rendered
     assert 'paths:\n' in rendered
     assert '    foo: bar\n' in rendered
     assert '    baz: bacon\n' in rendered
@@ -145,7 +173,7 @@ def test_invalid_sample_no_open_brace(site):
             {% sample 'les_mis.proto', 'message Book' %}
         """)
     with pytest.raises(jinja2.TemplateSyntaxError) as ex:
-        content = 'message Book;\n'
+        content = 'message Book\n'
         with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
             les_mis.env.get_template('test').render(aip=les_mis)
     assert ex.value.message.startswith('No block character')

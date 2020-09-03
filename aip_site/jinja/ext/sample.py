@@ -46,7 +46,7 @@ class SampleExtension(jinja2.ext.Extension):
             raise jinja2.TemplateSyntaxError(
                 filename=parser.filename,
                 lineno=lineno,
-                message='File not found: %s' % filename,
+                message=f'File not found: {filename}',
             )
 
         # Tease out the desired symbol.
@@ -68,7 +68,7 @@ class SampleExtension(jinja2.ext.Extension):
         start = match.start()
         try:
             ix, block_token = sorted([
-                (loc + 1, i) for i in (':', '{')
+                (loc + 1, i) for i in (':', '{', ';')
                 if (loc := code.find(i, start)) != -1])[0]
         except IndexError:
             raise jinja2.TemplateSyntaxError(
@@ -76,6 +76,14 @@ class SampleExtension(jinja2.ext.Extension):
                 message=f'No block character (:, {{) found after {symbol}.',
                 lineno=code.count('\n', 0, start) - 1,
             )
+
+        # Push the start marker backwards to include any leading comments.
+        lines = code[0:start - 1].split('\n')
+        for line in reversed(lines):
+            if re.search(r'^[\s]*(//|#)', line):
+                start -= len(line) + 1
+            else:
+                break
 
         # If we got a `:`, we parse by indentation, stopping at the beginning
         # of the next line with the same indentation as our match.
@@ -88,21 +96,28 @@ class SampleExtension(jinja2.ext.Extension):
             else:
                 snippet = code[start:]
             snippet = textwrap.dedent(snippet)
-        # We got a `{`; we find the corresponding closed brace.
-        else:  # block_token == '{':
-            cursor = start
+
+        # We got a '{'; Find the corresponding closed brace.
+        elif block_token == '{':
+            cursor = match.start()
             while (close_brace := code.find('}', cursor)) != -1:
-                s, e = start, close_brace + 1
+                s, e = match.start(), close_brace + 1
                 if code.count('{', s, e) == code.count('}', s, e):
-                    snippet = textwrap.dedent(code[s:e])
+                    snippet = textwrap.dedent(code[start:e])
                     break
                 cursor = e
             else:
+                # Unable to find a corresponding closed brace; complain.
                 raise jinja2.TemplateSyntaxError(
                     filename=filename,
                     message=f'No corresponding }} found for {symbol}.',
                     lineno=code.count('\n', 0, start) - 1,
                 )
+
+        # We got a ';'. Stop there.
+        else:
+            end = code.find(';', match.start()) + 1
+            snippet = textwrap.dedent(code[start:end])
 
         # We have a snippet. Time to put the Markdown together.
         md = '\n'.join((
