@@ -177,7 +177,7 @@ def test_invalid_sample_no_open_brace(site):
         with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
             les_mis.env.get_template('test').render(aip=les_mis)
     assert ex.value.message.startswith('No block character')
-    assert ex.value.message.endswith('message Book.')
+    assert ex.value.message.endswith('message Book')
 
 
 def test_invalid_sample_no_close_brace(site):
