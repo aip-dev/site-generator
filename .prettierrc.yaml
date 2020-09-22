@@ -1,4 +1,8 @@
 ---
+overrides:
+  - files: '*.md.j2'
+    options:
+      parser: markdown
 printWidth: 79
 proseWrap: always
 singleQuote: true

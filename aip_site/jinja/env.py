@@ -15,15 +15,18 @@
 import os
 
 import jinja2
+import jinja2.ext
+import jinja2.nodes
 
 from aip_site import md
 
 
 TEMPLATE_DIR = os.path.realpath(
-    os.path.join(os.path.dirname(__file__), 'support', 'templates'),
+    os.path.join(os.path.dirname(__file__), '..', 'support', 'templates'),
 )
 
 
+# "Standard" jinja2 environment that loads from the filesystem.
 jinja_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(searchpath=TEMPLATE_DIR),
     undefined=jinja2.StrictUndefined,

@@ -18,13 +18,13 @@ import re
 from scss.compiler import compile_file  # type: ignore
 import flask
 
-from aip_site import env
+from aip_site.jinja.env import jinja_env
 from aip_site.models.site import Site
 
 
 ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 app = flask.Flask('aip', static_folder=f'{ROOT}/aip_site/support/assets/')
-app.jinja_env = env.jinja_env  # type: ignore
+app.jinja_env = jinja_env  # type: ignore
 
 
 @app.route('/')

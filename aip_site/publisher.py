@@ -22,7 +22,7 @@ import typing
 from scss.compiler import compile_file  # type: ignore
 import click
 
-from aip_site import env
+from aip_site.jinja.env import jinja_env
 from aip_site.models.aip import AIP
 from aip_site.models.scope import Scope
 from aip_site.models.site import Site
@@ -85,7 +85,7 @@ class Publisher:
         for redirect in getattr(doc, 'redirects', set()):
             rpath = f'{self.output_dir}{redirect}.html'
             with io.open(rpath, 'w') as f:
-                f.write(env.jinja_env.get_template('redirect.html.j2').render(
+                f.write(jinja_env.get_template('redirect.html.j2').render(
                     site=self.site,
                     target=doc,
                 ))
@@ -96,7 +96,7 @@ class Publisher:
         path = f'{self.output_dir}{os.path.sep}{path}'
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with io.open(path, 'w') as f:
-            f.write(env.jinja_env.get_template(tmpl).render(
+            f.write(jinja_env.get_template(tmpl).render(
                 site=self.site,
                 path=path.split('.')[0],
             ))

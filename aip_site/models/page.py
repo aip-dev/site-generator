@@ -22,7 +22,7 @@ import typing
 import yaml
 
 from aip_site import md
-from aip_site.env import jinja_env
+from aip_site.jinja.env import jinja_env
 from aip_site.utils import cached_property
 
 
