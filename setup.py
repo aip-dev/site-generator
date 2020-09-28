@@ -21,7 +21,7 @@ PACKAGE_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 setup(
     name='aip-site-generator',
-    version='0.2.0',
+    version='0.3.0',
     license='Apache 2.0',
     author='Luke Sneeringer',
     author_email='lukesneeringer@google.com',
