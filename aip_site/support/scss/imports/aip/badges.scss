@@ -16,3 +16,10 @@
   background-color: $glue-yellow-50;
   border: 1px solid $glue-yellow-200;
 }
+
+h3.reviewing::after {
+  @extend .aip-state;
+  @extend .aip-state-reviewing;
+  content: 'Reviewing';
+  font-size: 0.5em;
+}
