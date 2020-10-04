@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import io
 import os
 
 from setuptools import find_packages, setup  # type: ignore
@@ -19,9 +20,12 @@ from setuptools import find_packages, setup  # type: ignore
 
 PACKAGE_ROOT = os.path.abspath(os.path.dirname(__file__))
 
+with io.open(os.path.join(PACKAGE_ROOT, 'VERSION'), 'r') as version_file:
+    VERSION = version_file.read().strip()
+
 setup(
     name='aip-site-generator',
-    version='0.3.0',
+    version=VERSION,
     license='Apache 2.0',
     author='Luke Sneeringer',
     author_email='lukesneeringer@google.com',
