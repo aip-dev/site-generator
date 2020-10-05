@@ -59,7 +59,7 @@ $.when($.ready).then(() => {
   }
 
   // Make "reviewing sections" of approved AIPs show a badge.
-  let reviewing = $('p').filter((_, el) => $(el).text() === '[^reviewing]');
+  let reviewing = $('h3 + p').filter((_, el) => $(el).text() === '[^reviewing]');
   reviewing.prev('h3').addClass('reviewing');
   reviewing.remove();
 
