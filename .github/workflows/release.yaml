@@ -14,7 +14,6 @@ jobs:
       - name: Get the version from the tag.
         id: get_version
         run: echo ::set-output name=version::${GITHUB_REF/refs\/tags\/v/}
-    steps:
       - name: Get the release notes from the previous release to this one.
         id: release_tool
         run: python ./.github/release_notes.py
