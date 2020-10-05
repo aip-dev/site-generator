@@ -82,6 +82,7 @@ class AIP:
                 TabExtension,
             ],
             loader=loaders.AIPLoader(self),
+            undefined=jinja2.StrictUndefined,
         )
 
     @property
@@ -125,7 +126,9 @@ class AIP:
             with io.open(self.path, 'r') as f:
                 contents = f.read()
             _, body = contents.lstrip('-\n').split('---\n', maxsplit=1)
-            return {'generic': jinja2.Template(body)}
+            return {'generic': jinja2.Template(body,
+                undefined=jinja2.StrictUndefined,
+            )}
 
         # Return a dictionary with all of the templates.
         #
