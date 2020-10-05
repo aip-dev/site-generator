@@ -13,7 +13,7 @@ jobs:
           fetch-depth: 0
       - name: Get the version from the tag.
         id: get_version
-        run: echo ::set-output name=version::${GITHUB_REF/refs\/tags\/v/}
+        run: echo ::set-output name=version::${GITHUB_REF:11}
       - name: Get the release notes from the previous release to this one.
         id: release_tool
         run: python ./.github/release_notes.py
