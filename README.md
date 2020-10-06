@@ -1,10 +1,12 @@
 # aip.dev static site generator
 
-Welcome to our NIH static site generator.
+This is the site generator for [aip.dev](https://aip.dev) and its forks. It
+takes AIP files in a git repository and outputs a static website.
 
 ## Why?
 
 We are not fans of rolling our own tools when off-the-shelf alternatives exist.
+However, the AIP project has grown sufficiently mature to warrant it.
 
 GitHub Pages normally automatically builds documentation with [Jekyll][], but
 as the AIP system has grown, we are beginning to reach the limits of what
@@ -26,8 +28,10 @@ There are some additional advantages that we unlock with a custom generator:
   rather than modifying existing files.
 - We can provide useful abstractions for common deviations between companies
   (e.g. case systems) that minimize the need to fork AIPs.
+- We can customize the Markdown parsing where necessary (tabs, hotlinking,
+  etc.).
 
-## Grumble. Fine. How does it work?
+## How does it work?
 
 This is essentially split into three parts:
 

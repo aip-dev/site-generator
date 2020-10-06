@@ -1,0 +1,60 @@
+---
+name: release
+on:
+  push:
+    tags: v[0-9]+.[0-9]+.[0-9]+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    container: python:3.8
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Get the version from the tag.
+        id: get_version
+        run: echo ::set-output name=version::${GITHUB_REF:11}
+        shell: bash
+      - name: Get the release notes from the previous release to this one.
+        id: release_tool
+        run: python ./.github/release_notes.py
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      release_notes: ${{ steps.release_tool.outputs.release_notes }}
+  github_release:
+    runs-on: ubuntu-latest
+    needs: inspect
+    steps:
+      - name: Create the GitHub release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          tag_name: v${{ needs.inspect.outputs.version }}
+          release_name: aip-site-generator ${{ needs.inspect.outputs.version }}
+          body: ${{ needs.inspect.outputs.release_notes }}
+          draft: false
+          prerelease: false
+  pypi_release:
+    runs-on: ubuntu-latest
+    container: python:3.8
+    needs:
+      - inspect
+      - github_release
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install twine.
+        run: pip install twine
+      - name: Set the version number.
+        run: |
+          cat > VERSION <<EOF
+          ${{ needs.inspect.outputs.version }}
+          EOF
+      - name: Create a source distribution.
+        run: python setup.py sdist
+      - name: Upload to PyPI.
+        run: twine upload dist/*
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+          TWINE_NON_INTERACTIVE: 1
