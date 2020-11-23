@@ -35,6 +35,7 @@ def test_content_hotlinking(site):
     assert '[AIP-62](/62)' in hunchback.content
     assert '[AIP-31](/31)' in les_mis.content
     assert '[[AIP-31](/31)](/31)' not in les_mis.content
+    assert '[A Tale of Two Cities](/59)' in les_mis.content
 
 
 def test_content_hotlinking_relative_uri(site):

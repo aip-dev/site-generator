@@ -64,6 +64,11 @@ class AIP:
             fr'[AIP-\1]({self.site.relative_uri}/\1)',
             answer,
         )
+        answer = re.sub(
+            r'(?<=\])\[aip-([\d]{1,3})\]',  # [aip-###], after a `]`.
+            fr'({self.site.relative_uri}/\1)',
+            answer,
+        )
 
         # Append the changelog if there is one.
         if self.changelog:
