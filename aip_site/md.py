@@ -56,7 +56,7 @@ class MarkdownDocument(str):
         # We use the Markdown toc plugin to separate the headers and identify
         # where to put the blocks. Iterate over each toc_token and encapsulate
         # it in a block.
-        toc_tokens = self._engine.toc_tokens
+        toc_tokens = self._engine.toc_tokens  # type: ignore
         for ix, token in enumerate(toc_tokens):
             try:
                 next_token = toc_tokens[ix + 1]
@@ -87,7 +87,7 @@ class MarkdownDocument(str):
         # The `html` property caches, so this does not entail any additional
         # performance hit.
         self.html
-        return self._engine.toc
+        return self._engine.toc  # type: ignore
 
 
 def _add_block(content: str, toc_token, next_toc_token=None) -> str:
