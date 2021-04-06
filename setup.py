@@ -47,7 +47,7 @@ setup(
         'click==7.1.2',
         'flask==1.1.2',
         'itsdangerous==1.1.0',
-        'jinja2==2.11.2',
+        'jinja2==2.11.3',
         'markdown==3.3.3',
         'markupsafe==1.1.1',
         'pygments==2.7.3',
