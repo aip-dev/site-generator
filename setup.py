@@ -53,7 +53,7 @@ setup(
         'pygments==2.7.3',
         'pymdown-extensions==8.1',
         'pyscss==1.3.7',
-        'pyyaml==5.3.1',
+        'pyyaml==5.4',
         'six==1.15.0',
         'werkzeug==1.0.1',
     ),
