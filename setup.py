@@ -50,7 +50,7 @@ setup(
         'jinja2==2.11.3',
         'markdown==3.3.3',
         'markupsafe==1.1.1',
-        'pygments==2.7.3',
+        'pygments==2.7.4',
         'pymdown-extensions==8.1',
         'pyscss==1.3.7',
         'pyyaml==5.4',
