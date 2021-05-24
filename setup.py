@@ -48,7 +48,7 @@ setup(
         'flask==1.1.2',
         'itsdangerous==1.1.0',
         'jinja2==2.11.3',
-        'markdown==3.3.3',
+        'markdown==3.3.4',
         'markupsafe==1.1.1',
         'pygments==2.7.4',
         'pymdown-extensions==8.1',
