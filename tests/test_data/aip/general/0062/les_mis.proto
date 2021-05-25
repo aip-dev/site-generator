@@ -14,10 +14,27 @@
 
 syntax = "proto3";
 
+import "google/api/annotations.proto";
+
+// A trivial library service.
+service Library {
+  // Get a single book.
+  rpc GetBook(GetBookRequest) returns (Book) {
+    option (google.api.http) = {
+      get: "/v1/{name=publishers/*/books/*}"
+    };
+  }
+}
+
 // A representation of a book.
 message Book {
   string name = 1;
   string title = 2;
   repeated string authors = 3;
   float rating = 4;
+}
+
+// Request message for GetBook.
+message GetBookRequest {
+  string name = 1;
 }

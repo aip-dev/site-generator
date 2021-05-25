@@ -74,7 +74,7 @@ class SampleExtension(jinja2.ext.Extension):
             try:
                 ix, block_token = sorted([
                     (loc + 1, i) for i in (':', '{', ';')
-                    if (loc := code.find(i, start)) != -1])[0]
+                    if (loc := code.find(i, match.end())) != -1])[0]
             except IndexError:
                 raise jinja2.TemplateSyntaxError(
                     filename=filename,
@@ -94,8 +94,8 @@ class SampleExtension(jinja2.ext.Extension):
             # start of the next line with the same indentation as our match.
             snippet = ''
             if block_token == ':':
-                indent = match.groups()[0]
-                end_match = re.search(rf'^{indent}[\S]+', code[ix:],
+                indent = len(match.groups()[0])
+                end_match = re.search(r'^[\s]{0,%d}[\S]+' % indent, code[ix:],
                     re.MULTILINE,
                 )
                 if end_match:

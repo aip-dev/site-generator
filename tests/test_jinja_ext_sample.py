@@ -119,7 +119,7 @@ def test_valid_sample_yaml(site):
     assert 'something_else:' not in rendered
 
 
-def test_valid_sample_yaml_to_eof(site):
+def test_valid_sample_yaml_indented(site):
     with mock.patch.object(loaders, 'AIPLoader', TestLoader):
         les_mis = site.aips[62]
         les_mis.env.loader.set_template_body(r"""
@@ -129,9 +129,58 @@ def test_valid_sample_yaml_to_eof(site):
         ---
         schemas:
             meh: meh
+            # The paths.
+            paths:
+                foo: bar
+                baz: bacon
+        something_else: false
+    """)
+    with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
+        rendered = les_mis.env.get_template('test').render(aip=les_mis)
+    assert '```yaml\n' in rendered
+    assert '# The paths.\n' in rendered
+    assert 'paths:\n' in rendered
+    assert '    foo: bar\n' in rendered
+    assert '    baz: bacon\n' in rendered
+    assert 'schemas:' not in rendered
+    assert 'something_else:' not in rendered
+
+
+def test_valid_sample_yaml_with_braces(site):
+    with mock.patch.object(loaders, 'AIPLoader', TestLoader):
+        les_mis = site.aips[62]
+        les_mis.env.loader.set_template_body(r"""
+            {% sample 'les_mis.oas.yaml', '/v1/publishers/{publisherId}' %}
+        """)
+    content = textwrap.dedent("""
+        ---
+        paths:
+            /v1/publishers/{publisherId}:
+                baz: bacon
+        something_else: false
+    """).strip('\n')
+    with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
+        rendered = les_mis.env.get_template('test').render(aip=les_mis)
+    assert '```yaml\n' in rendered
+    assert 'paths:\n' not in rendered
+    assert '/v1/publishers/{publisherId}:\n' in rendered
+    assert '    baz: bacon\n' in rendered
+    assert 'something_else:' not in rendered
+
+
+def test_valid_sample_yaml_to_eof(site):
+    with mock.patch.object(loaders, 'AIPLoader', TestLoader):
+        les_mis = site.aips[62]
+        les_mis.env.loader.set_template_body(r"""
+            {% sample 'les_mis.oas.yaml', 'paths' %}
+        """)
+    content = textwrap.dedent("""
+        ---
         paths:
             foo: bar
             baz: bacon
+        schemas:
+            meh: meh
     """)
     with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
         rendered = les_mis.env.get_template('test').render(aip=les_mis)

@@ -92,7 +92,7 @@ def test_coerce(markdown_doc):
 
 
 def test_html(markdown_doc):
-    assert '<h1>Title</h1>' in markdown_doc.html
+    assert '<h1 id="title">Title</h1>' in markdown_doc.html
     assert '<h2 id="sub-1">Sub 1</h2>' in markdown_doc.html
     assert '<h3 id="still-drilling">Still drilling</h3>' in markdown_doc.html
     assert '<p>Stuff and things, things and stuff.</p>' in markdown_doc.html
