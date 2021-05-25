@@ -47,7 +47,7 @@ def test_repo_path(site):
 
 def test_render(site):
     rendered = site.pages['page'].render()
-    assert '<h1>This is a page.</h1>' in rendered
+    assert '<h1 id="this-is-a-page">This is a page.</h1>' in rendered
     assert '<p>Is it not amazing?</p>' in rendered
     assert '<h2 id="information">Information</h2>' in rendered
     assert '<h3 id="fake-latin">Fake Latin</h3>' in rendered
