@@ -91,7 +91,7 @@ def test_views(site):
 
 def test_render(site):
     rendered = site.aips[43].render()
-    assert '<h1>A Christmas Carol</h1>' in rendered
+    assert '<h1 id="a-christmas-carol">A Christmas Carol</h1>' in rendered
     assert '<h2 id="guidance">Guidance</h2>' in rendered
     assert '<h2 id="changelog">Changelog</h2>' in rendered
 
