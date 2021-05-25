@@ -44,6 +44,22 @@ savait, c'est que, lorsqu'il revint d'Italie, il était prêtre.
 
 {% sample 'les_mis.proto', 'message Book' %}
 
+{% tab oas %}
+
+{% sample 'les_mis.oas.yaml', 'components' %}
+
+{% endtabs %}
+
+## Reading a book
+
+{% tab proto %}
+
+{% sample 'les_mis.proto', 'rpc GetBook', 'message GetBookRequest' %}
+
+{% tab oas %}
+
+{% sample 'les_mis.oas.yaml', '/publishers/{publisherId}/books/{bookId}' %}
+
 {% endtabs %}
 
 ## Further reading

@@ -36,5 +36,6 @@ def test_template_auto_blocks(site):
         'guidance',
         'bp_myriel',
         'interface_definitions',
+        'reading_a_book',
         'further_reading',
     )
