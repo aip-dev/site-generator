@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     container: python:3.8
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Get the version from the tag.
@@ -42,7 +42,7 @@ jobs:
       - inspect
       - github_release
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install twine.
         run: pip install twine
       - name: Set the version number.
