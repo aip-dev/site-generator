@@ -74,7 +74,7 @@ class AIPLoader(jinja2.loaders.BaseLoader):
         # Return the template information.
         return contents, fn, None
 
-    def list_templates(self) -> typing.Sequence[str]:
+    def list_templates(self) -> typing.List[str]:
         answer = []
 
         # We sort the files in the directory to read more specific
