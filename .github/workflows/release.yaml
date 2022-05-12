@@ -6,7 +6,7 @@ on:
 jobs:
   inspect:
     runs-on: ubuntu-latest
-    container: python:3.8
+    container: python:3.9
     steps:
       - uses: actions/checkout@v2
         with:
@@ -37,7 +37,7 @@ jobs:
           prerelease: false
   pypi_release:
     runs-on: ubuntu-latest
-    container: python:3.8
+    container: python:3.9
     needs:
       - inspect
       - github_release
