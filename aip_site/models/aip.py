@@ -57,8 +57,9 @@ class AIP:
         )
 
         # Hotlink AIP references.
-        # We only hotlink the generally-applicable ones for now until we have
-        # a prefix system implemented.
+        # We can (now) link to AIPs outside of general, those that are numbered
+        # > 999, because the site redirects from 4221 to client-libraries/4221
+        # now, for example.
         answer = re.sub(
             r'\b(?<!\[)AIP-(\d+)\b',  # AIP-###, but not after a `[`.
             fr'[AIP-\1]({self.site.relative_uri}/\1)',
