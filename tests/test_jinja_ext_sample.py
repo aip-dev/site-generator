@@ -244,6 +244,8 @@ def test_invalid_sample_no_close_brace(site):
 
 
 class TestLoader(loaders.AIPLoader):
+    __test__ = False
+
     def set_template_body(self, text):
         self._body = textwrap.dedent(text)
 
