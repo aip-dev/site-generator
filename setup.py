@@ -55,6 +55,8 @@ setup(
         'pyscss==1.3.7',
         'pyyaml==5.4.1',
         'six==1.16.0',
+        'types-Markdown==3.3.15',
+        'types-PyYAML==6.0.7',
         'werkzeug==2.0.1',
     ),
     python_requires='>=3.8',
