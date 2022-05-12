@@ -38,6 +38,8 @@ jobs:
     container: python:3.9
     steps:
       - uses: actions/checkout@v2
+      - name: Install package.
+        run: pip install .
       - name: Install mypy.
         run: pip install mypy
       - name: Run mypy.
