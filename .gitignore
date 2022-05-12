@@ -3,3 +3,5 @@
 .mypy_cache
 htmlcov
 *.egg-info
+build/
+dist/
