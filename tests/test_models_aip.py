@@ -33,6 +33,8 @@ def test_content_hotlinking(site):
     hunchback = site.aips[31]
     les_mis = site.aips[62]
     assert '[AIP-62](/62)' in hunchback.content
+    assert '[Orpheus](/1622)' in hunchback.content
+    assert '[AIP-1609](/1609)' in hunchback.content
     assert '[A Tale of Two Cities](/59)' in hunchback.content
     assert '[AIP-31](/31)' in les_mis.content
     assert '[[AIP-31](/31)](/31)' not in les_mis.content
