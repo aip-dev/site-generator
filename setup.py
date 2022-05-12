@@ -58,7 +58,6 @@ setup(
         'types-Markdown==3.3.15',
         'types-PyYAML==6.0.7',
         'werkzeug==2.1.2',
-
     ),
     python_requires='>=3.8',
     classifiers=(
