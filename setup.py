@@ -55,7 +55,10 @@ setup(
         'pyscss==1.4.0',
         'pyyaml==6.0',
         'six==1.16.0',
+        'types-Markdown==3.3.15',
+        'types-PyYAML==6.0.7',
         'werkzeug==2.1.2',
+
     ),
     python_requires='>=3.8',
     classifiers=(
