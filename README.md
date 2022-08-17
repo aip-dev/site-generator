@@ -114,6 +114,40 @@ Lorem ipsum dolor set something-not-amet
 {% endblock %}
 ```
 
+## Developer Setup
+If you want to contribute to this project you will want to have a setup where
+you can make changes to the code and see the result of your changes as soon as
+possible. Here is a quick way to set up a local development environment that
+will enable you to work on the code without having to reinstall the command
+line scripts.
+
+1. Check out the source
+
+```bash
+$ mkdir src
+$ cd src
+$ git clone https://github.com/aip-dev/site-generator.git
+```
+
+2. Setup python virtual environment
+
+```bash
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+```
+
+3. PIP Install with the editable option
+
+```bash
+$ pip install --editable .
+```
+
+4. Serve the aip.dev site
+
+```bash
+$ aip-site-serve /path/to/aip/data/on/your/system
+```
+
 [dataclasses]: https://docs.python.org/3/library/dataclasses.html
 [jekyll]: https://jekyllrb.com/
 [jinja2]: https://jinja.palletsprojects.com/en/2.11.x/
