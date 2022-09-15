@@ -55,7 +55,7 @@ def page(page: str, collection: str = "general"):
     if page in site.scopes:
         return site.scopes[page].render()
     if (
-        collection in site.collections and 
+        collection in site.collections and
         page in site.collections[collection].pages
     ):
         return site.collections[collection].pages[page].render()
