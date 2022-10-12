@@ -6,7 +6,7 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
-    container: python:3.9
+    container: python:3.10
     steps:
       - uses: actions/checkout@v3
       - name: Install package.
@@ -17,7 +17,7 @@ jobs:
         run: pytest
   build:
     runs-on: ubuntu-latest
-    container: python:3.9
+    container: python:3.10
     steps:
       - uses: actions/checkout@v3
       - name: Install package.
@@ -26,7 +26,7 @@ jobs:
         run: aip-site-gen tests/test_data/ /out/
   lint:
     runs-on: ubuntu-latest
-    container: python:3.9
+    container: python:3.10
     steps:
       - uses: actions/checkout@v3
       - name: Install the linter (flake8).
@@ -35,7 +35,7 @@ jobs:
         run: flake8 aip_site/ tests/
   mypy:
     runs-on: ubuntu-latest
-    container: python:3.9
+    container: python:3.10
     steps:
       - uses: actions/checkout@v3
       - name: Install package.
