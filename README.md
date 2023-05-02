@@ -121,6 +121,16 @@ possible. Here is a quick way to set up a local development environment that
 will enable you to work on the code without having to reinstall the command
 line scripts.
 
+### Dependencies
+
+You'll need venv. On Linux, install with,
+
+```
+sudo apt-get install python3-venv
+```
+
+### Running dev env
+
 1. Check out the source
 
 ```bash
