@@ -1,13 +1,13 @@
 # Copyright 2020 Google LLC
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
+# distributed under the License is distributed on an 'AS IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -37,10 +37,10 @@ setup(
     description='Static site generator for aip.dev and forks.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    entry_points="""[console_scripts]
+    entry_points='''[console_scripts]
         aip-site-gen=aip_site.cli:publish
         aip-site-serve=aip_site.cli:serve
-    """,
+    ''',
     platforms='Posix; MacOS X',
     include_package_data=True,
     install_requires=(
@@ -52,7 +52,9 @@ setup(
         'markupsafe==2.1.1',
         'pygments==2.13.0',
         'pymdown-extensions==9.7',
-        'pyscss==1.4.0',
+        # pinning via GitHub release until https://github.com/Kronuz/pyScss/pull/426
+        # is released on PyPi.
+        'pyscss @ git+https://github.com/Kronuz/pyScss.git@73559d047706ccd4593cf6aa092de71f35164723',
         'pyyaml==6.0',
         'six==1.16.0',
         'types-Markdown==3.4.2.1',
