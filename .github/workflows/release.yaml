@@ -15,6 +15,12 @@ jobs:
         id: get_version
         run: echo ::set-output name=version::${GITHUB_REF:11}
         shell: bash
+      # see https://github.com/actions/runner-images/issues/6775
+      # newer versions of Git check ownership of multi-user repositories
+      # and will fail if one attempts to run Git in the checkout.
+      - name: Workaround dubious ownership Git security check
+        id: workaround_dubious_ownership
+        run: git config --global --add safe.directory /__w/site-generator/site-generator
       - name: Get the release notes from the previous release to this one.
         id: release_tool
         run: python ./.github/release_notes.py
