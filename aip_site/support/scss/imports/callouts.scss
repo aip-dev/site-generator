@@ -1,11 +1,15 @@
 @import 'imports/colors';
 
 .callout {
-  margin-top: 5px;
+  margin-top: 10px;
   margin-left: 20px;
   margin-right: 20px;
   padding: 10px 20px;
   color: $glue-grey-800;
+}
+
+.callout + .callout {
+  margin-top: 15px;
 }
 
 .important {
