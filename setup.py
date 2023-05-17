@@ -62,7 +62,7 @@ setup(
         'werkzeug==2.2.2',
     ),
     python_requires='>=3.8',
-    classifiers=(
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: Developers',
@@ -70,6 +70,6 @@ setup(
         'Operating System :: POSIX',
         'Programming Language :: Python :: 3.8',
         'Topic :: Software Development :: Code Generators',
-    ),
+    ],
     zip_safe=False,
 )

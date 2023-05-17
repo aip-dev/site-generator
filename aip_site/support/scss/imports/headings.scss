@@ -4,10 +4,14 @@
   h2,
   h3,
   h4,
-  h5 {
+  h5,
+  a[name] {
     // This creates a "fake block" above the header that does not show up
     // anywhere but tricks the browser into thinking that the anchor is 80px
     // higher than it actually is.
+    cursor: default;
+    outline: none;
+
     &::before {
       display: block;
       content: ' ';
@@ -22,6 +26,8 @@
     }
   }
   h4 {
+    padding-bottom: 5px;
+
     &.aip-number {
       line-height: 1em;
 
