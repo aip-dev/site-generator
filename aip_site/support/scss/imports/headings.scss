@@ -9,6 +9,9 @@
     // This creates a "fake block" above the header that does not show up
     // anywhere but tricks the browser into thinking that the anchor is 80px
     // higher than it actually is.
+    cursor: default;
+    outline: none;
+
     &::before {
       display: block;
       content: ' ';
