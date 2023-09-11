@@ -150,16 +150,6 @@ class AIP:
         return self.content.title
 
     @property
-    def updated(self):
-        """Return the most recent date on the changelog.
-
-        If there is no changelog, return the created date instead.
-        """
-        if self.changelog:
-            return sorted(self.changelog)[0].date
-        return self.created
-
-    @property
     def _legacy(self) -> bool:
         """Return True if this is a legacy AIP, False otherwise."""
         return self.path.endswith('.md')
