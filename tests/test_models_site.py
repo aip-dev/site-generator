@@ -12,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from aip_site.models.aip import AIP
-from aip_site.models.page import Page
-from aip_site.models.scope import Scope
+from aep_site.models.aep import AEP
+from aep_site.models.page import Page
+from aep_site.models.scope import Scope
 
 
-def test_aips(site):
-    assert isinstance(site.aips, dict)
-    assert all([isinstance(i, AIP) for i in site.aips.values()])
-    assert 62 in site.aips
-    assert 1622 in site.aips
+def test_aeps(site):
+    assert isinstance(site.aeps, dict)
+    assert all([isinstance(i, AEP) for i in site.aeps.values()])
+    assert 62 in site.aeps
+    assert 1622 in site.aeps
 
 
 def test_base_url(site):
-    assert site.base_url == 'https://aip.dev'
+    assert site.base_url == 'https://aep.dev'
 
 
 def test_pages(site):
@@ -42,7 +42,7 @@ def test_relative_uri(site):
 
 
 def test_repo_url(site):
-    assert site.repo_url == 'https://github.com/aip-dev/site-generator'
+    assert site.repo_url == 'https://github.com/aep-dev/site-generator'
 
 
 def test_scopes(site):

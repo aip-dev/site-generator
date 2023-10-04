@@ -17,21 +17,21 @@ import pytest
 
 
 def test_list_templates(site):
-    assert site.aips[62].env.list_templates() == ['en', 'generic']
-    assert site.aips[38].env.list_templates() == ['generic']
+    assert site.aeps[62].env.list_templates() == ['en', 'generic']
+    assert site.aeps[38].env.list_templates() == ['generic']
 
 
 def test_get_template(site):
     assert isinstance(
-        site.aips[62].env.get_template('generic'),
+        site.aeps[62].env.get_template('generic'),
         jinja2.Template,
     )
     with pytest.raises(jinja2.TemplateNotFound):
-        site.aips[62].env.get_template('bogus')
+        site.aeps[62].env.get_template('bogus')
 
 
 def test_template_auto_blocks(site):
-    generic = site.aips[62].env.get_template('generic')
+    generic = site.aeps[62].env.get_template('generic')
     assert tuple(generic.blocks.keys()) == (
         'guidance',
         'bp_myriel',

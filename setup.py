@@ -27,19 +27,19 @@ with io.open(os.path.join(PACKAGE_ROOT, 'README.md'), 'r') as readme_file:
     long_description = readme_file.read().strip()
 
 setup(
-    name='aip-site-generator',
+    name='aep-site-generator',
     version=VERSION,
     license='Apache 2.0',
     author='Luke Sneeringer',
     author_email='lukesneeringer@google.com',
-    url='https://github.com/aip-dev/site-generator.git',
+    url='https://github.com/aep-dev/site-generator.git',
     packages=find_packages(exclude=['tests']),
-    description='Static site generator for aip.dev and forks.',
+    description='Static site generator for aep.dev and forks.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     entry_points="""[console_scripts]
-        aip-site-gen=aip_site.cli:publish
-        aip-site-serve=aip_site.cli:serve
+        aep-site-gen=aep_site.cli:publish
+        aep-site-serve=aep_site.cli:serve
     """,
     platforms='Posix; MacOS X',
     include_package_data=True,

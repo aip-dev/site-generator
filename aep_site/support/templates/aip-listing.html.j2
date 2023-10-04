@@ -1,0 +1,69 @@
+{% extends 'layouts/base.html.j2' %}
+
+{% block title %}{{ scope.title }} AEPs{% endblock %}
+
+{% block nav %}
+{{ nav.render_nav(site, path, scope_code=scope.code) -}}
+{% endblock %}
+
+{% block content %}
+<aside id="aep-sidebar" class="docs-component-sidebar">
+  {# Table of Contents -#}
+  <section id="aep-toc" class="docs-component-sidebar-toc">
+    <div class="toc">
+      <span class="toctitle">Categories</span>
+      <ul>
+        {% for cat in scope.categories.values() -%}
+        <li><a href="#{{ cat.code }}">{{ cat.title }}</a></li>
+        {% endfor -%}
+      </ul>
+    </div>
+  </section>
+
+  {# Action links -#}
+  <section class="docs-component-sidebar-actions">
+    <ul>
+      <li><a href="{{ site.repo_url }}/issues/">File Bug</a></li>
+    </ul>
+  </section>
+</aside>
+
+<section id="aep-main" class="docs-component-main">
+  {% with title = '{0} AEPs'.format(scope.title) -%}
+    {% include 'includes/breadcrumb.html.j2' %}
+  {% endwith -%}
+
+  {% for cat in scope.categories.values() -%}
+  {% if cat.aeps -%}
+  <h3 id="{{ cat.code }}">{{ cat.title }}</h3>
+  <table class="aep-listing">
+    <thead>
+      <tr>
+        <th style="text-align: right;">Number</th>
+        <th>Title</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for aep in cat.aeps.values() -%}
+      {% if aep.state in ('approved', 'reviewing', 'draft') -%}
+      <tr>
+        <td style="text-align: right;">{{ aep.id }}</td>
+        <td>
+          <a href="{{ site.relative_uri }}/{{ aep.id }}">{{ aep.title }}</a>
+          {% if aep.state != 'approved' -%}
+          <span class="aep-state aep-state-{{ aep.state }}">
+            {{ aep.state | capitalize }}
+          </span>
+          {% endif -%}
+        </td>
+      </tr>
+      {% endif -%}
+    {% endfor -%}
+    </tbody>
+  </table>
+  {% endif -%}
+  {% endfor -%}
+
+  {% include 'includes/footer.html.j2' %}
+</section>
+{% endblock %}

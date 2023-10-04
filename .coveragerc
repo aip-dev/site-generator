@@ -2,7 +2,7 @@
 branch = True
 omit =
   # Testing the development server is both difficult and unnecessary.
-  aip_site/server.py
+  aep_site/server.py
 
 [report]
 fail_under = 100

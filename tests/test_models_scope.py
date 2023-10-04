@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from aip_site.models.aip import AIP
+from aep_site.models.aep import AEP
 
 
-def test_aips(site):
+def test_aeps(site):
     general = site.scopes['general']
     poetry = site.scopes['poetry']
-    assert all([i.id < 1000 for i in general.aips.values()])
-    assert all([i.id > 1000 for i in poetry.aips.values()])
-    assert all([isinstance(i, AIP) for i in general.aips.values()])
+    assert all([i.id < 1000 for i in general.aeps.values()])
+    assert all([i.id > 1000 for i in poetry.aeps.values()])
+    assert all([isinstance(i, AEP) for i in general.aeps.values()])
 
 
 def test_categories(site):

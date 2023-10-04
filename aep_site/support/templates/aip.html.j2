@@ -1,0 +1,62 @@
+{% extends 'layouts/base.html.j2' %}
+
+{% block title -%}
+AEP-{{ aep.id }}: {{ aep.title }}
+{%- endblock %}
+
+{% block js %}
+<script type="text/javascript" src="{{ site.relative_uri }}/assets/js/syntax.js"></script>
+{% if 'js_scripts' in aep.config -%}
+{% for js_script in aep.config.js_scripts -%}
+<script type="text/javascript" src="{{ site.relative_uri }}{{ js_script }}?v={{ site.revision }}"></script>
+{% endfor -%}
+{% endif -%}
+{% endblock %}
+
+{% block nav %}
+{{ nav.render_nav(site, path, scope_code=aep.scope.code) -}}
+{% endblock %}
+
+{% block content %}
+<aside id="aep-sidebar" class="docs-component-sidebar">
+  {# Wikipedia-style info table. -#}
+  <table id="aep-summary">
+    <tr><th colspan="2">{{ aep.title }}</th></tr>
+    <tr><td>Number</td><td>{{ aep.id }}</td></tr>
+    {% with permalink = site.base_url + aep.relative_uri -%}
+    <tr><td>Permalink</td><td><a href="{{ permalink }}">{{ permalink.lstrip('htps')[3:] }}</a></td></tr>
+    {% endwith -%}
+    {% if aep.scope.code != 'general' -%}
+    <tr><td>Scope</td><td>{{ aep.scope.title }}</td></tr>
+    {% endif -%}
+    {% if aep.state -%}
+    <tr><td>State</td><td>{{ aep.state | capitalize }}</td></tr>
+    {% endif -%}
+    <tr><td>Created</td><td>{{ aep.created }}</td></tr>
+    <tr><td>Updated</td><td>{{ aep.updated }}</td></tr>
+  </table>
+
+  {# Table of contents -#}
+  <section id="aep-toc" class="docs-component-sidebar-toc">
+    {{ aep.content.toc }}
+  </section>
+
+  {# Action links -#}
+  <section class="docs-component-sidebar-actions">
+    <ul>
+      <li><a href="{{ site.repo_url }}/issues/">File Bug</a></li>
+      <li><a href="{{ site.repo_url }}/blob/master{{ aep.repo_path }}">View source</a></li>
+      <li><a href="{{ site.repo_url }}/edit/master{{ aep.repo_path }}">Edit this page</a></li>
+    </ul>
+  </section>
+</aside>
+<section id="aep-main" class="docs-component-main">
+  {% with title = aep.title -%}
+    {% include 'includes/breadcrumb.html.j2' %}
+  {% endwith -%}
+  {% include 'includes/state_banners/' + aep.state + '.html.j2' ignore missing %}
+  <h4 class="aep-number">AEP-{{ aep.id }}</h4>
+  {{ aep.content.html }}
+  {% include 'includes/footer.html.j2' %}
+</section>
+{% endblock %}

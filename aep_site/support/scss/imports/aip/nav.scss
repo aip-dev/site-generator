@@ -1,0 +1,13 @@
+#aep-nav {
+  .nav-item {
+    span.aep-number {
+      display: inline-block;
+      min-width: 26px;
+      text-align: right;
+
+      &:after {
+        content: '. ';
+      }
+    }
+  }
+}

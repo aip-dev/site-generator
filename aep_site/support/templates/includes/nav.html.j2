@@ -1,0 +1,26 @@
+{% macro render_nav(site, path='/', scope_code='general') -%}
+<nav id="aep-nav" class="docs-component-nav">
+  <ul class="nav-list">
+    {# AEPs by Scope -#}
+    <li class="nav-item nav-item-header">AEPs by Scope</li>
+    {% for scope in site.scopes.values() -%}
+    {% if not scope.config.hidden | default('') -%}
+    <li class="nav-item{% if path.endswith(scope.code) %} nav-item-active{% endif %}">
+      <a href="{{ site.relative_uri }}/{{ scope.code }}">{{ scope.title }}</a>
+    </li>
+    {% endif -%}
+    {% endfor -%}
+
+    {# Individual AEPs in this scope. -#}
+    <li class="nav-item nav-item-header">AEPs</li>
+    {% for aep in site.scopes[scope_code].aeps.values() -%}
+    <li class="nav-item{% if path.split('/')[-1] == '{:d}'.format(aep.id) %} nav-item-active{% endif %}">
+      <a href="{{ site.relative_uri }}/{{ aep.id }}">
+        <span class="aep-number">{{ aep.id }}</span>
+        {{ aep.title }}
+      </a>
+    </li>
+    {% endfor -%}
+  </ul>
+</nav>
+{% endmacro -%}

@@ -1,6 +1,6 @@
 ---
 links:
-  - title: Browse AIPs
+  - title: Browse AEPs
     relative_url: /general
   - title: Page
     relative_url: /page
@@ -9,4 +9,4 @@ links:
   - title: Contributing
     relative_url: /contributing
   - title: API Linter
-    absolute_url: https://linter.aip.dev/
+    absolute_url: https://linter.aep.dev/

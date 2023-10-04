@@ -19,24 +19,24 @@ import textwrap
 import jinja2
 import pytest
 
-from aip_site.jinja import loaders
+from aep_site.jinja import loaders
 
 
 def test_valid_sample(site):
-    with mock.patch.object(loaders, 'AIPLoader', TestLoader):
-        les_mis = site.aips[62]
+    with mock.patch.object(loaders, 'AEPLoader', TestLoader):
+        les_mis = site.aeps[62]
         les_mis.env.loader.set_template_body(r"""
             {% sample 'les_mis.proto', 'message Book' %}
         """)
-        rendered = les_mis.env.get_template('test').render(aip=les_mis)
+        rendered = les_mis.env.get_template('test').render(aep=les_mis)
         assert '```proto\n' in rendered
         assert 'message Book {' in rendered
         assert 'string name = 1;' in rendered
 
 
 def test_valid_sample_nested_braces(site):
-    with mock.patch.object(loaders, 'AIPLoader', TestLoader):
-        les_mis = site.aips[62]
+    with mock.patch.object(loaders, 'AEPLoader', TestLoader):
+        les_mis = site.aeps[62]
         les_mis.env.loader.set_template_body(r"""
             {% sample 'les_mis.proto', 'message Book' %}
         """)
@@ -56,7 +56,7 @@ def test_valid_sample_nested_braces(site):
         }
     """.lstrip())
     with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
-        rendered = les_mis.env.get_template('test').render(aip=les_mis)
+        rendered = les_mis.env.get_template('test').render(aep=les_mis)
     assert '```proto\n' in rendered
     assert '// A representation for a book.\n' in rendered
     assert 'message Book {\n' in rendered
@@ -69,8 +69,8 @@ def test_valid_sample_nested_braces(site):
 
 
 def test_valid_sample_semi(site):
-    with mock.patch.object(loaders, 'AIPLoader', TestLoader):
-        les_mis = site.aips[62]
+    with mock.patch.object(loaders, 'AEPLoader', TestLoader):
+        les_mis = site.aeps[62]
         les_mis.env.loader.set_template_body(r"""
             {% sample 'les_mis.proto', 'string name' %}
         """)
@@ -83,7 +83,7 @@ def test_valid_sample_semi(site):
         }
     """)
     with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
-        rendered = les_mis.env.get_template('test').render(aip=les_mis)
+        rendered = les_mis.env.get_template('test').render(aep=les_mis)
     assert '```proto\n' in rendered
     assert '// The name of the book.' in rendered
     assert 'string name = 1;\n' in rendered
@@ -93,8 +93,8 @@ def test_valid_sample_semi(site):
 
 
 def test_valid_sample_yaml(site):
-    with mock.patch.object(loaders, 'AIPLoader', TestLoader):
-        les_mis = site.aips[62]
+    with mock.patch.object(loaders, 'AEPLoader', TestLoader):
+        les_mis = site.aeps[62]
         les_mis.env.loader.set_template_body(r"""
             {% sample 'les_mis.oas.yaml', 'paths' %}
         """)
@@ -109,7 +109,7 @@ def test_valid_sample_yaml(site):
         something_else: false
     """)
     with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
-        rendered = les_mis.env.get_template('test').render(aip=les_mis)
+        rendered = les_mis.env.get_template('test').render(aep=les_mis)
     assert '```yaml\n' in rendered
     assert '# The paths.\n' in rendered
     assert 'paths:\n' in rendered
@@ -120,8 +120,8 @@ def test_valid_sample_yaml(site):
 
 
 def test_valid_sample_yaml_indented(site):
-    with mock.patch.object(loaders, 'AIPLoader', TestLoader):
-        les_mis = site.aips[62]
+    with mock.patch.object(loaders, 'AEPLoader', TestLoader):
+        les_mis = site.aeps[62]
         les_mis.env.loader.set_template_body(r"""
             {% sample 'les_mis.oas.yaml', 'paths' %}
         """)
@@ -136,7 +136,7 @@ def test_valid_sample_yaml_indented(site):
         something_else: false
     """)
     with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
-        rendered = les_mis.env.get_template('test').render(aip=les_mis)
+        rendered = les_mis.env.get_template('test').render(aep=les_mis)
     assert '```yaml\n' in rendered
     assert '# The paths.\n' in rendered
     assert 'paths:\n' in rendered
@@ -147,8 +147,8 @@ def test_valid_sample_yaml_indented(site):
 
 
 def test_valid_sample_yaml_with_braces(site):
-    with mock.patch.object(loaders, 'AIPLoader', TestLoader):
-        les_mis = site.aips[62]
+    with mock.patch.object(loaders, 'AEPLoader', TestLoader):
+        les_mis = site.aeps[62]
         les_mis.env.loader.set_template_body(r"""
             {% sample 'les_mis.oas.yaml', '/v1/publishers/{publisherId}' %}
         """)
@@ -160,7 +160,7 @@ def test_valid_sample_yaml_with_braces(site):
         something_else: false
     """).strip('\n')
     with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
-        rendered = les_mis.env.get_template('test').render(aip=les_mis)
+        rendered = les_mis.env.get_template('test').render(aep=les_mis)
     assert '```yaml\n' in rendered
     assert 'paths:\n' not in rendered
     assert '/v1/publishers/{publisherId}:\n' in rendered
@@ -169,8 +169,8 @@ def test_valid_sample_yaml_with_braces(site):
 
 
 def test_valid_sample_yaml_to_eof(site):
-    with mock.patch.object(loaders, 'AIPLoader', TestLoader):
-        les_mis = site.aips[62]
+    with mock.patch.object(loaders, 'AEPLoader', TestLoader):
+        les_mis = site.aeps[62]
         les_mis.env.loader.set_template_body(r"""
             {% sample 'les_mis.oas.yaml', 'paths' %}
         """)
@@ -183,7 +183,7 @@ def test_valid_sample_yaml_to_eof(site):
             meh: meh
     """)
     with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
-        rendered = les_mis.env.get_template('test').render(aip=les_mis)
+        rendered = les_mis.env.get_template('test').render(aep=les_mis)
     assert '```yaml\n' in rendered
     assert 'paths:\n' in rendered
     assert '    foo: bar\n' in rendered
@@ -192,58 +192,58 @@ def test_valid_sample_yaml_to_eof(site):
 
 
 def test_invalid_sample_file_not_found(site):
-    with mock.patch.object(loaders, 'AIPLoader', TestLoader):
-        les_mis = site.aips[62]
+    with mock.patch.object(loaders, 'AEPLoader', TestLoader):
+        les_mis = site.aeps[62]
         les_mis.env.loader.set_template_body(r"""
             {% sample 'bogus.proto', 'message Book' %}
         """)
     with pytest.raises(jinja2.TemplateSyntaxError) as ex:
-        les_mis.env.get_template('test').render(aip=les_mis)
+        les_mis.env.get_template('test').render(aep=les_mis)
     assert ex.value.message.startswith('File not found: ')
     assert ex.value.message.endswith('bogus.proto')
 
 
 def test_invalid_sample_symbol_not_found(site):
-    with mock.patch.object(loaders, 'AIPLoader', TestLoader):
-        les_mis = site.aips[62]
+    with mock.patch.object(loaders, 'AEPLoader', TestLoader):
+        les_mis = site.aeps[62]
         les_mis.env.loader.set_template_body(r"""
             {% sample 'les_mis.proto', 'message Movie' %}
         """)
     with pytest.raises(jinja2.TemplateSyntaxError) as ex:
-        les_mis.env.get_template('test').render(aip=les_mis)
+        les_mis.env.get_template('test').render(aep=les_mis)
     assert ex.value.message.startswith('Symbol not found: ')
     assert ex.value.message.endswith('message Movie')
 
 
 def test_invalid_sample_no_open_brace(site):
-    with mock.patch.object(loaders, 'AIPLoader', TestLoader):
-        les_mis = site.aips[62]
+    with mock.patch.object(loaders, 'AEPLoader', TestLoader):
+        les_mis = site.aeps[62]
         les_mis.env.loader.set_template_body(r"""
             {% sample 'les_mis.proto', 'message Book' %}
         """)
     with pytest.raises(jinja2.TemplateSyntaxError) as ex:
         content = 'message Book\n'
         with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
-            les_mis.env.get_template('test').render(aip=les_mis)
+            les_mis.env.get_template('test').render(aep=les_mis)
     assert ex.value.message.startswith('No block character')
     assert ex.value.message.endswith('message Book')
 
 
 def test_invalid_sample_no_close_brace(site):
-    with mock.patch.object(loaders, 'AIPLoader', TestLoader):
-        les_mis = site.aips[62]
+    with mock.patch.object(loaders, 'AEPLoader', TestLoader):
+        les_mis = site.aeps[62]
         les_mis.env.loader.set_template_body(r"""
             {% sample 'les_mis.proto', 'message Book' %}
         """)
     with pytest.raises(jinja2.TemplateSyntaxError) as ex:
         content = 'message Book {\n'
         with mock.patch.object(io, 'open', mock.mock_open(read_data=content)):
-            les_mis.env.get_template('test').render(aip=les_mis)
+            les_mis.env.get_template('test').render(aep=les_mis)
     assert ex.value.message.startswith('No corresponding }')
     assert ex.value.message.endswith('message Book.')
 
 
-class TestLoader(loaders.AIPLoader):
+class TestLoader(loaders.AEPLoader):
     __test__ = False
 
     def set_template_body(self, text):

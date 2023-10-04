@@ -1,0 +1,25 @@
+@import 'imports/colors';
+
+.aep-state {
+  border-radius: 4px;
+  font-size: 0.75em;
+  margin-left: 10px;
+  padding: 2px 5px;
+}
+
+.aep-state-reviewing {
+  background-color: $glue-blue-50;
+  border: 1px solid $glue-blue-200;
+}
+
+.aep-state-draft {
+  background-color: $glue-yellow-50;
+  border: 1px solid $glue-yellow-200;
+}
+
+h3.reviewing::after {
+  @extend .aep-state;
+  @extend .aep-state-reviewing;
+  content: 'Reviewing';
+  font-size: 0.5em;
+}
