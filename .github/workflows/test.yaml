@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     container: python:3.10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install package.
         run: pip install -e .
       - name: Install test dependencies.
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     container: python:3.10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install package.
         run: pip install .
       - name: Build the test site.
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     container: python:3.10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install the linter (flake8).
         run: pip install flake8
       - name: Run the linter.
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     container: python:3.10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install package.
         run: pip install .
       - name: Install mypy.
