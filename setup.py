@@ -49,7 +49,7 @@ setup(
         'itsdangerous==2.1.2',
         'jinja2==3.1.2',
         'markdown==3.4.1',
-        'markupsafe==2.1.1',
+        'markupsafe==3.0.2',
         'pygments==2.13.0',
         'pymdown-extensions==9.7',
         'pyscss==1.4.0',
