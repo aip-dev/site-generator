@@ -40,15 +40,6 @@ AIP-{{ aip.id }}: {{ aip.title }}
   <section id="aip-toc" class="docs-component-sidebar-toc">
     {{ aip.content.toc }}
   </section>
-
-  {# Action links -#}
-  <section class="docs-component-sidebar-actions">
-    <ul>
-      <li><a href="{{ site.repo_url }}/issues/">File Bug</a></li>
-      <li><a href="{{ site.repo_url }}/blob/master{{ aip.repo_path }}">View source</a></li>
-      <li><a href="{{ site.repo_url }}/edit/master{{ aip.repo_path }}">Edit this page</a></li>
-    </ul>
-  </section>
 </aside>
 <section id="aip-main" class="docs-component-main">
   {% with title = aip.title -%}
