@@ -10,3 +10,4 @@ ignore =
   # This catches line breaks after "and" / "or" as a means of breaking up
   # long if statements, which PEP 8 explicitly encourages.
   W504
+exclude=aip_site/vendor
