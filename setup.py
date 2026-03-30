@@ -50,7 +50,7 @@ setup(
         'jinja2==3.1.2',
         'markdown==3.4.1',
         'markupsafe==2.1.1',
-        'pygments==2.13.0',
+        'pygments==2.20.0',
         'pymdown-extensions==9.7',
         'pyscss @ git+https://github.com/aip-dev/pyScss.git@master',
         'pyyaml==6.0.1',
