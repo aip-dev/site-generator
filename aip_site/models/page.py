@@ -19,11 +19,22 @@ import re
 import os
 import typing
 
+import jinja2
+import jinja2.sandbox
 import yaml
 
 from aip_site import md
 from aip_site.jinja.env import jinja_env
 from aip_site.utils import cached_property
+
+
+# Pages under ``pages/**/*.md.j2`` are repository content (potentially authored
+# by external contributors via pull request) rather than packaged application
+# templates. Render them in a sandboxed environment so template expressions
+# cannot reach arbitrary Python attributes / callables.
+_page_jinja_env = jinja2.sandbox.ImmutableSandboxedEnvironment(
+    undefined=jinja2.StrictUndefined,
+)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -48,7 +59,7 @@ class Page:
         # this specific content in isolation (apart from the page template).
         if self.repo_path.endswith('.j2'):
             return md.MarkdownDocument(
-                jinja_env.from_string(self.body).render(site=self.site),
+                _page_jinja_env.from_string(self.body).render(site=self.site),
             )
 
         # This is not a template; just return the body directly.
