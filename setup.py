@@ -51,7 +51,7 @@ setup(
         'markdown==3.8.1',
         'markupsafe==2.1.1',
         'pygments==2.13.0',
-        'pymdown-extensions==9.7',
+        'pymdown-extensions==11.0.1',
         'pyscss @ git+https://github.com/aip-dev/pyScss.git@master',
         'pyyaml==6.0.1',
         'six==1.16.0',
