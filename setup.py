@@ -49,7 +49,7 @@ setup(
         'itsdangerous==2.1.2',
         'jinja2==3.1.2',
         'markdown==3.8.1',
-        'markupsafe==2.1.1',
+        'markupsafe==3.0.3',
         'pygments==2.13.0',
         'pymdown-extensions==9.7',
         'pyscss @ git+https://github.com/aip-dev/pyScss.git@master',
