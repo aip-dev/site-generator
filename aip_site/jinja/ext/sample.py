@@ -39,8 +39,53 @@ class SampleExtension(jinja2.ext.Extension):
             symbols.append(parser.stream.expect('string').value)
 
         # Load the sample file.
-        aip = self.environment.loader.aip
-        filename = os.path.join(aip.path, fn)
+        aip = getattr(self.environment.loader, 'aip', None)
+        aip_path = getattr(aip, 'path', None)
+        if (
+            not aip or
+            not fn or
+            not fn.strip() or
+            '\x00' in fn or
+            os.path.isabs(fn) or
+            getattr(aip, '_legacy', False) or
+            not isinstance(aip_path, str) or
+            not os.path.isdir(aip_path)
+        ):
+            raise jinja2.TemplateSyntaxError(
+                filename=parser.filename,
+                lineno=lineno,
+                message=f'Invalid sample path: {fn}',
+            )
+
+        try:
+            resolved_aip_dir = os.path.realpath(aip_path)
+            filename = os.path.realpath(os.path.join(resolved_aip_dir, fn))
+        except (ValueError, TypeError):
+            raise jinja2.TemplateSyntaxError(
+                filename=parser.filename,
+                lineno=lineno,
+                message=f'Invalid sample path: {fn}',
+            )
+
+        base_dir = (
+            resolved_aip_dir
+            if resolved_aip_dir.endswith(os.path.sep)
+            else resolved_aip_dir + os.path.sep
+        )
+        if not filename.startswith(base_dir):
+            raise jinja2.TemplateSyntaxError(
+                filename=parser.filename,
+                lineno=lineno,
+                message=f'Path traversal detected in sample: {fn}',
+            )
+
+        if os.path.isdir(filename):
+            raise jinja2.TemplateSyntaxError(
+                filename=parser.filename,
+                lineno=lineno,
+                message=f'Invalid sample path: {fn}',
+            )
+
         try:
             with io.open(filename, 'r') as f:
                 code = f.read()
@@ -49,6 +94,12 @@ class SampleExtension(jinja2.ext.Extension):
                 filename=parser.filename,
                 lineno=lineno,
                 message=f'File not found: {filename}',
+            )
+        except IsADirectoryError:
+            raise jinja2.TemplateSyntaxError(
+                filename=parser.filename,
+                lineno=lineno,
+                message=f'Invalid sample path: {fn}',
             )
 
         # Tease out the desired symbols and make snippets.
