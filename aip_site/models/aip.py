@@ -21,6 +21,7 @@ import re
 import typing
 
 import jinja2
+import jinja2.sandbox
 
 from aip_site import md
 from aip_site.jinja.env import jinja_env
@@ -82,7 +83,7 @@ class AIP:
 
     @cached_property
     def env(self) -> jinja2.Environment:
-        return jinja2.Environment(
+        return jinja2.sandbox.ImmutableSandboxedEnvironment(
             extensions=[
                 SampleExtension,
                 TabExtension,
@@ -132,9 +133,7 @@ class AIP:
             with io.open(self.path, 'r') as f:
                 contents = f.read()
             _, body = contents.lstrip('-\n').split('---\n', maxsplit=1)
-            return {'generic': jinja2.Template(body,
-                undefined=jinja2.StrictUndefined,
-            )}
+            return {'generic': self.env.from_string(body)}
 
         # Return a dictionary with all of the templates.
         #

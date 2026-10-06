@@ -13,6 +13,11 @@
 # limitations under the License.
 
 from datetime import date
+import os
+from unittest import mock
+
+import jinja2
+import pytest
 
 from aip_site.models.aip import Change
 
@@ -102,3 +107,132 @@ def test_change_ordering():
     a = Change(date=date(2020, 4, 21), message='Eight years')
     b = Change(date=date(2012, 4, 21), message='Got married')
     assert a < b
+
+
+def test_aip_sandboxed_environment(site):
+    """Verify unsafe attribute access is blocked in modern and legacy AIPs."""
+    unsafe_expr = "{{ [].__class__.__base__.__subclasses__() }}"
+
+    # Modern AIP via env
+    with pytest.raises(jinja2.exceptions.SecurityError):
+        site.aips[38].env.from_string(unsafe_expr).render()
+
+    # Legacy AIP via env
+    with pytest.raises(jinja2.exceptions.SecurityError):
+        site.aips[43].env.from_string(unsafe_expr).render()
+
+    # Legacy AIP template compiled from markdown body
+    legacy_aip = site.aips[43]
+    legacy_aip.__dict__.pop('templates', None)
+    mock_data = f'---\ntitle: Evil\n---\n{unsafe_expr}'
+    with mock.patch('io.open', mock.mock_open(read_data=mock_data)):
+        with pytest.raises(jinja2.exceptions.SecurityError):
+            legacy_aip.templates['generic'].render(aip=legacy_aip, site=site)
+
+
+def test_sample_path_traversal_blocked(site):
+    """Verify path traversal and invalid paths in sample tag are rejected."""
+    # Parent directory traversal
+    with pytest.raises(
+        jinja2.exceptions.TemplateSyntaxError,
+        match="Path traversal detected",
+    ):
+        site.aips[38].env.from_string(
+            "{% sample '../../../../etc/passwd', 'test' %}"
+        ).render()
+
+    # Subdirectory escape traversal
+    with pytest.raises(
+        jinja2.exceptions.TemplateSyntaxError,
+        match="Path traversal detected",
+    ):
+        site.aips[38].env.from_string(
+            "{% sample 'subdir/../../../etc/passwd', 'test' %}"
+        ).render()
+
+    # Current directory traversal
+    with pytest.raises(
+        jinja2.exceptions.TemplateSyntaxError,
+        match="Path traversal detected",
+    ):
+        site.aips[38].env.from_string("{% sample '.', 'test' %}").render()
+
+    # Relative parent traversal
+    with pytest.raises(
+        jinja2.exceptions.TemplateSyntaxError,
+        match="Path traversal detected",
+    ):
+        site.aips[38].env.from_string("{% sample '..', 'test' %}").render()
+
+    # Absolute path
+    with pytest.raises(
+        jinja2.exceptions.TemplateSyntaxError,
+        match="Invalid sample path",
+    ):
+        site.aips[38].env.from_string(
+            "{% sample '/etc/passwd', 'test' %}"
+        ).render()
+
+    # Empty path
+    with pytest.raises(
+        jinja2.exceptions.TemplateSyntaxError,
+        match="Invalid sample path",
+    ):
+        site.aips[38].env.from_string("{% sample '', 'test' %}").render()
+
+    # Whitespace path
+    with pytest.raises(
+        jinja2.exceptions.TemplateSyntaxError,
+        match="Invalid sample path",
+    ):
+        site.aips[38].env.from_string("{% sample '   ', 'test' %}").render()
+
+    # Embedded null byte path
+    with pytest.raises(
+        jinja2.exceptions.TemplateSyntaxError,
+        match="Invalid sample path",
+    ):
+        site.aips[38].env.from_string(
+            "{% sample 'foo\x00bar.proto', 'test' %}"
+        ).render()
+
+    # Subdirectory within AIP path is not a sample file
+    subdir = os.path.join(site.aips[38].path, 'test_sub')
+    os.makedirs(subdir, exist_ok=True)
+    try:
+        with pytest.raises(
+            jinja2.exceptions.TemplateSyntaxError,
+            match="Invalid sample path",
+        ):
+            site.aips[38].env.from_string(
+                "{% sample 'test_sub', 'test' %}"
+            ).render()
+    finally:
+        os.rmdir(subdir)
+
+    # Legacy AIP attempting to use sample tag
+    with pytest.raises(
+        jinja2.exceptions.TemplateSyntaxError,
+        match="Invalid sample path",
+    ):
+        site.aips[43].env.from_string(
+            "{% sample 'les_mis.proto', 'test' %}"
+        ).render()
+
+
+def test_sandboxed_mutation_blocked(site):
+    """Verify mutating operations are blocked in templates."""
+    with pytest.raises(jinja2.exceptions.SecurityError):
+        site.aips[38].env.from_string(
+            "{{ aip.config.clear() }}"
+        ).render(aip=site.aips[38])
+
+    with pytest.raises(jinja2.exceptions.SecurityError):
+        site.aips[38].env.from_string(
+            "{{ aip._legacy }}"
+        ).render(aip=site.aips[38])
+
+    with pytest.raises(jinja2.exceptions.SecurityError):
+        site.aips[38].env.from_string(
+            "{{ site.config.clear() }}"
+        ).render(site=site)
