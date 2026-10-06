@@ -45,7 +45,7 @@ setup(
     include_package_data=True,
     install_requires=(
         'click==8.1.3',
-        'flask==2.2.2',
+        'flask==3.1.3',
         'itsdangerous==2.1.2',
         'jinja2==3.1.2',
         'markdown==3.8.1',
