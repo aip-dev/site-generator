@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import io
+import json
 import os
 import re
 import tempfile
@@ -47,6 +48,19 @@ def test_publisher_search_assets():
             html = f.read()
         assert '/assets/js/search/search.js' in html
         assert 'tipuesearch.min.js' not in html
+
+
+def test_search_index_urls_are_json_encoded():
+    with tempfile.TemporaryDirectory() as tmp:
+        Publisher('tests/test_data/', tmp).publish_site()
+        index = os.path.join(
+            tmp, 'assets', 'js', 'search', 'tipuesearch_content.js',
+        )
+        with io.open(index, 'r') as f:
+            urls = re.findall(r"'url': (.*),$", f.read(), re.MULTILINE)
+    assert urls
+    for url in urls:
+        assert json.loads(url).startswith('/'), url
 
 
 def test_search_js_uses_text_only_dom_apis():

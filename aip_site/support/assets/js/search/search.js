@@ -25,9 +25,11 @@
   const CONTEXT_BEFORE = 60;
   const MIN_LENGTH = 3;
   // Each term is a linear scan of the whole index, so keep queries bounded.
-  // Input beyond MAX_QUERY_LENGTH characters (cut at a word boundary) and
-  // terms beyond MAX_TERMS are ignored.
+  // Raw input is first capped at MAX_RAW_LENGTH. After trimming, input beyond
+  // MAX_QUERY_LENGTH characters (cut at a word boundary) and terms beyond
+  // MAX_TERMS are ignored.
   const MAX_QUERY_LENGTH = 256;
+  const MAX_RAW_LENGTH = 4 * MAX_QUERY_LENGTH;
   const MAX_TERMS = 10;
   const STOP_WORDS = new Set([
     'a', 'about', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from',
@@ -78,9 +80,20 @@
     };
   }
 
+  // Only link to pages on this site.
+  function isSameOrigin(url) {
+    const origin = window.location.origin;
+    try {
+      return new URL(url, origin).origin === origin;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function search(pages, query) {
     const results = [];
     for (const page of pages) {
+      if (!isSameOrigin(page.url)) continue;
       const title = page.title.toLowerCase();
       const text = page.text.toLowerCase();
       const url = page.url.toLowerCase();
@@ -251,7 +264,7 @@
 
   function run() {
     const params = new URLSearchParams(window.location.search);
-    const raw = params.get('q');
+    const raw = (params.get('q') || '').slice(0, MAX_RAW_LENGTH);
     const input = document.getElementById('tipue_search_input');
     const container = document.getElementById('tipue_search_content');
     if (!raw || !container || typeof tipuesearch === 'undefined') return;

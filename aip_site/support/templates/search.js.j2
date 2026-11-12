@@ -6,7 +6,7 @@ var tipuesearch = {'pages': [
     'title': {{ aip.title | striptags | tojson }},
     'text': {{ aip.content.html | striptags | tojson }},
     'tags': '',
-    'url': '{{ site.relative_uri }}{{ aip.relative_uri }}',
+    'url': {{ (site.relative_uri ~ aip.relative_uri) | tojson }},
   },
 {% endfor -%}
 ]};
