@@ -14,10 +14,8 @@ Search
 {% endblock %}
 
 {% block js %}
-<script type="text/javascript" src="{{ site.relative_uri }}/assets/js/search/tipuesearch_content.js"></script>
-<script type="text/javascript" src="{{ site.relative_uri }}/assets/js/search/tipuesearch_set.js"></script>
-<script type="text/javascript" src="{{ site.relative_uri }}/assets/js/search/tipuesearch.min.js"></script>
-<script type="text/javascript" src="{{ site.relative_uri }}/assets/js/search/pagination.js"></script>
+<script type="text/javascript" src="{{ site.relative_uri }}/assets/js/search/tipuesearch_content.js?v={{ site.revision }}"></script>
+<script type="text/javascript" src="{{ site.relative_uri }}/assets/js/search/search.js?v={{ site.revision }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -42,11 +40,4 @@ Search
 <div id="tipue_search_content"></div>
 </section>
 
-<script>
-  $.when($.ready).then(() =>
-    $('#tipue_search_input').tipuesearch({
-      wholeWords: false,
-    })
-  );
-</script>
 {% endblock %}
