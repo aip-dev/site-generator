@@ -32,16 +32,47 @@
   const MAX_RAW_LENGTH = 4 * MAX_QUERY_LENGTH;
   const MAX_TERMS = 10;
   const STOP_WORDS = new Set([
-    'a', 'about', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from',
-    'how', 'i', 'in', 'is', 'it', 'of', 'on', 'or', 'that', 'the', 'this',
-    'to', 'was', 'what', 'when', 'where', 'which', 'who', 'why', 'will',
+    'a',
+    'about',
+    'an',
+    'and',
+    'are',
+    'as',
+    'at',
+    'be',
+    'by',
+    'for',
+    'from',
+    'how',
+    'i',
+    'in',
+    'is',
+    'it',
+    'of',
+    'on',
+    'or',
+    'that',
+    'the',
+    'this',
+    'to',
+    'was',
+    'what',
+    'when',
+    'where',
+    'which',
+    'who',
+    'why',
+    'will',
     'with',
   ]);
 
   function countOccurrences(haystack, needle) {
     let n = 0;
-    for (let i = haystack.indexOf(needle); i !== -1;
-         i = haystack.indexOf(needle, i + needle.length)) {
+    for (
+      let i = haystack.indexOf(needle);
+      i !== -1;
+      i = haystack.indexOf(needle, i + needle.length)
+    ) {
       n++;
     }
     return n;
@@ -49,30 +80,53 @@
 
   // Returns {terms, excluded, stopped}. All strings are lower-case.
   function parseQuery(raw) {
-    let q = raw.trim().toLowerCase();
+    // Normalize case and whitespace, and cap long queries at a word boundary.
+    let q = Array.from(raw.toLowerCase(), (ch) => (ch.trim() ? ch : ' '))
+      .join('')
+      .trim();
     if (q.length > MAX_QUERY_LENGTH) {
       const cut = q.lastIndexOf(' ', MAX_QUERY_LENGTH);
       q = q.slice(0, cut > 0 ? cut : MAX_QUERY_LENGTH).trim();
-      // Keep a truncated quoted phrase a phrase.
-      if (q[0] === '"' || q[0] === "'") q += q[0];
     }
-    if (q.length > 1 && /^(["']).*\1$/.test(q)) {
-      const phrase = q.slice(1, -1).trim();
-      return {terms: phrase ? [phrase] : [], excluded: [], stopped: false};
-    }
+
     const terms = new Set();
     const excluded = new Set();
     let stopped = false;
-    for (const word of q.split(/\s+/)) {
-      if (!word) continue;
+
+    // Read the query from left to right, one quoted phrase or word at a time.
+    let rest = q;
+    while (rest) {
+      const quote = rest[0];
+      if (quote === '"' || quote === "'") {
+        // Quoted phrase: read up to the matching closing quote (or end).
+        const closeIdx = rest.indexOf(quote, 1);
+        const phrase = (
+          closeIdx === -1 ? rest.slice(1) : rest.slice(1, closeIdx)
+        )
+          .split(' ')
+          .filter(Boolean)
+          .join(' ');
+        if (phrase) terms.add(phrase);
+        rest = closeIdx === -1 ? '' : rest.slice(closeIdx + 1).trimStart();
+        continue;
+      }
+
+      // Unquoted word: read up to the next space (or end of query).
+      const spaceIdx = rest.indexOf(' ');
+      const word = spaceIdx === -1 ? rest : rest.slice(0, spaceIdx);
+      rest = spaceIdx === -1 ? '' : rest.slice(spaceIdx + 1).trimStart();
+
+      // Skip stop words and bare dashes; track '-word' exclusions.
       if (STOP_WORDS.has(word)) {
         stopped = true;
-      } else if (word.length > 1 && word[0] === '-') {
-        excluded.add(word.slice(1));
+      } else if (word.startsWith('-')) {
+        const excludedTerm = word.slice(1);
+        if (excludedTerm.replaceAll('-', '')) excluded.add(excludedTerm);
       } else {
         terms.add(word);
       }
     }
+
     return {
       terms: [...terms].slice(0, MAX_TERMS),
       excluded: [...excluded].slice(0, MAX_TERMS),
@@ -106,13 +160,14 @@
         score += 20 * countOccurrences(text, term);
         if (url.includes(term)) score += 20;
       }
-      if (score > 0) results.push({page, score});
+      if (score > 0) results.push({ page, score });
     }
     results.sort((a, b) => b.score - a.score);
     return results;
   }
 
-  // Returns a plain-text excerpt of `text`, starting near the first term.
+  // Returns a plain-text excerpt of `text`, starting near the earliest
+  // matching term.
   //
   // Note: offsets found in the lower-cased string are applied to the original.
   // For the rare characters whose lower-case form has a different length
@@ -120,7 +175,12 @@
   // always plain text, so this is cosmetic only.
   function makeSnippet(text, terms) {
     let start = 0;
-    const first = terms.length ? text.toLowerCase().indexOf(terms[0]) : -1;
+    // Center the snippet around the earliest matching term in the text.
+    const lower = text.toLowerCase();
+    const matchOffsets = terms
+      .map((term) => lower.indexOf(term))
+      .filter((i) => i !== -1);
+    const first = matchOffsets.length ? Math.min(...matchOffsets) : -1;
     if (first > CONTEXT_START) {
       // Start at a word boundary roughly CONTEXT_BEFORE characters before the
       // match, but never after the match itself.
@@ -146,8 +206,10 @@
       let bestLen = 0;
       for (const term of terms) {
         const j = lower.indexOf(term, i);
-        if (j !== -1 && (best === -1 || j < best ||
-                         (j === best && term.length > bestLen))) {
+        if (
+          j !== -1 &&
+          (best === -1 || j < best || (j === best && term.length > bestLen))
+        ) {
           best = j;
           bestLen = term.length;
         }
@@ -167,7 +229,7 @@
     }
   }
 
-  function el(tag, {id, className, text} = {}) {
+  function el(tag, { id, className, text } = {}) {
     const e = document.createElement(tag);
     if (id) e.id = id;
     if (className) e.className = className;
@@ -176,7 +238,7 @@
   }
 
   function link(href, text, className) {
-    const a = el('a', {className, text});
+    const a = el('a', { className, text });
     a.href = href;
     return a;
   }
@@ -185,7 +247,7 @@
     const pages = Math.ceil(total / PAGE_SIZE);
     if (pages <= 1) return;
     const current = Math.floor(start / PAGE_SIZE);
-    const ul = el('ul', {id: 'tipue_search_foot_boxes'});
+    const ul = el('ul', { id: 'tipue_search_foot_boxes' });
     const addItem = (label, pageIndex, accessKey) => {
       const li = el('li');
       li.setAttribute('role', 'navigation');
@@ -197,7 +259,11 @@
           q: raw,
           start: String(pageIndex * PAGE_SIZE),
         });
-        const a = link('?' + params.toString(), label, 'tipue_search_foot_box');
+        const a = link(
+          '?' + params.toString(),
+          label,
+          'tipue_search_foot_box'
+        );
         if (accessKey) a.accessKey = accessKey;
         li.appendChild(a);
         // The styled box is larger than the link; make all of it clickable.
@@ -213,7 +279,7 @@
       addItem(String(p + 1), p);
     }
     if (current + 1 < pages) addItem('More', current + 1, 'm');
-    const foot = el('div', {id: 'tipue_search_foot'});
+    const foot = el('div', { id: 'tipue_search_foot' });
     foot.appendChild(ul);
     const nav = el('nav');
     nav.appendChild(foot);
@@ -225,37 +291,46 @@
   }
 
   function renderWarning(container, query) {
+    // Exclusion-only queries (e.g. '-draft') keep 'Nothing found.'.
+    const onlyExcluded = !query.terms.length && query.excluded.length > 0;
     let text = 'Nothing found.';
     if (!isSearchable(query)) {
       if (query.stopped) {
         text = 'Nothing found. Common words are largely ignored.';
-      } else if (query.terms.length || !query.excluded.length) {
+      } else if (!onlyExcluded) {
         text = `Search should be ${MIN_LENGTH} characters or more.`;
       }
     }
-    container.replaceChildren(el('div', {id: 'tipue_search_warning', text}));
+    container.replaceChildren(el('div', { id: 'tipue_search_warning', text }));
   }
 
   function render(container, results, query, start, raw) {
     container.replaceChildren();
-    container.appendChild(el('div', {
-      id: 'tipue_search_results_count',
-      text: results.length === 1 ?
-          '1 result' : `${results.length.toLocaleString('en-US')} results`,
-    }));
-    for (const {page} of results.slice(start, start + PAGE_SIZE)) {
-      const title = el('div', {className: 'tipue_search_content_title'});
+    container.appendChild(
+      el('div', {
+        id: 'tipue_search_results_count',
+        text:
+          results.length === 1
+            ? '1 result'
+            : `${results.length.toLocaleString('en-US')} results`,
+      })
+    );
+    for (const { page } of results.slice(start, start + PAGE_SIZE)) {
+      const title = el('div', { className: 'tipue_search_content_title' });
       title.appendChild(link(page.url, page.title));
       container.appendChild(title);
 
-      const url = el('div', {className: 'tipue_search_content_url'});
+      const url = el('div', { className: 'tipue_search_content_url' });
       url.appendChild(link(page.url, page.url));
       container.appendChild(url);
 
       if (page.text) {
-        const text = el('div', {className: 'tipue_search_content_text'});
-        appendHighlighted(text, makeSnippet(page.text, query.terms),
-                          query.terms);
+        const text = el('div', { className: 'tipue_search_content_text' });
+        appendHighlighted(
+          text,
+          makeSnippet(page.text, query.terms),
+          query.terms
+        );
         container.appendChild(text);
       }
     }
@@ -270,7 +345,9 @@
     if (!raw || !container || typeof tipuesearch === 'undefined') return;
     if (input) input.value = raw;
     const query = parseQuery(raw);
-    const results = isSearchable(query) ? search(tipuesearch.pages, query) : [];
+    const results = isSearchable(query)
+      ? search(tipuesearch.pages, query)
+      : [];
     if (!results.length) {
       renderWarning(container, query);
       return;
